@@ -31,13 +31,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DESCRIPTION QMK keyboard firmware test for ChibiOS
 
 /* key matrix size */
-#define MATRIX_ROWS 1
-#define MATRIX_COLS 1
+#define MATRIX_ROWS 10
+#define MATRIX_COLS 7
 #define DIODE_DIRECTION COL2ROW
 #define MATRIX_ROW_PINS { A13, A14, A15, C10, C11, C12, F0 }
 #define MATRIX_COL_PINS { D2, B3, C13, C14, C15 }
+#define MATRIX_ROW_PINS_RIGHT { A13, A14, A15, C10, C11, C12, F0 }
+#define MATRIX_COL_PINS_RIGHT { D2, B3, C13, C14, C15 }
 
 /* define use i2c2 driver */
+#define USE_I2C
 #define I2C_DRIVER I2CD2
 
 /* define transmit/recieve */
