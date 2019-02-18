@@ -23,11 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x9696
 #define DEVICE_VER      0x0001
-<<<<<<< HEAD
-#define MANUFACTURER    ELliot Powell
-=======
 #define MANUFACTURER    Elliot Powell
->>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
 #define PRODUCT         ep96
 #define DESCRIPTION     A simple 96 key keyboard
 
@@ -49,26 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MATRIX_COL_PINS { D0, D1, D2, D3, D5, D4, D6, D7, B4, B5, B6, C7, F7, F6, F5, F4, F1, F0, E6 }
 #define UNUSED_PINS
 
-<<<<<<< HEAD
-/* COL2ROW, ROW2COL, or CUSTOM_MATRIX */
-#define DIODE_DIRECTION COL2ROW
-
-// #define BACKLIGHT_PIN B7
-// #define BACKLIGHT_BREATHING
-// #define BACKLIGHT_LEVELS 3
-
-// #define RGB_DI_PIN E2
-// #ifdef RGB_DI_PIN
-// #define RGBLIGHT_ANIMATIONS
-// #define RGBLED_NUM 16
-// #define RGBLIGHT_HUE_STEP 8
-// #define RGBLIGHT_SAT_STEP 8
-// #define RGBLIGHT_VAL_STEP 8
-=======
 /* COL2ROW, ROW2COL*/
 #define DIODE_DIRECTION COL2ROW
 
->>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
 // #endif
 
 /* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
@@ -77,11 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* define if matrix has ghost (lacks anti-ghosting diodes) */
 //#define MATRIX_HAS_GHOST
 
-<<<<<<< HEAD
-/* number of backlight levels */
-
-=======
->>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
 #define LOCKING_SUPPORT_ENABLE
 /* Locking resynchronize hack */
@@ -125,14 +99,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-<<<<<<< HEAD
-/* key combination for magic key command */
-#define IS_COMMAND() ( \
-    keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
-)
-
-=======
->>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
 /* control how magic key switches layers */
 //#define MAGIC_KEY_SWITCH_LAYER_WITH_FKEYS  true
 //#define MAGIC_KEY_SWITCH_LAYER_WITH_NKEYS  true
@@ -237,7 +203,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LCD_E_PIN        1            //< pin  for Enable line
 #endif
 */
-<<<<<<< HEAD
-
-=======
->>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
