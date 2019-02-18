@@ -2,7 +2,11 @@
   "keyboard_name": "ep96",
   "maintainer": "e11i0t23",
   "width": 19,
+<<<<<<< HEAD
   "hight": 6,
+=======
+  "height": 6,
+>>>>>>> 100697ebab662b3c19299cf0002d77bac3f00ca6
   "layouts": {
     "LAYOUT": {
       "key_count": 100,
