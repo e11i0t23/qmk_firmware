@@ -26,10 +26,6 @@
 #include "ch.h"
 #include <hal.h>
 
-#ifndef MS2ST
-#define MS2ST(msec) ((systime_t)((((msec) * CH_CFG_ST_FREQUENCY - 1L) / 1000L) + 1L))
-#endif
-
 #ifndef I2C1_BANK
     #define I2C1_BANK GPIOB
 #endif
