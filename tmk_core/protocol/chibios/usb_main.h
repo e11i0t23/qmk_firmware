@@ -104,4 +104,11 @@ void console_flush_output(void);
 
 void sendchar_pf(void *p, char c);
 
+/* addidtions by elliot powell 2019 */
+
+/*MS2ST config*/
+#ifndef MS2ST
+#define MS2ST(msec) ((systime_t)((((msec) * CH_CFG_ST_FREQUENCY - 1L) / 1000L) + 1L))
+#endif
+
 #endif /* _USB_MAIN_H_ */

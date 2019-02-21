@@ -54,6 +54,10 @@ ifeq ($(PLATFORM),CHIBIOS)
   else ifeq ($(strip $(TERMINAL_ENABLE)), yes)
     TMK_COMMON_SRC += $(CHIBIOS)/os/various/syscalls.c
   endif
+  TMK_COMMON_SRC += $(CHIBIOS)/os/lib/src/chmemheaps.c
+  TMK_COMMON_SRC += $(CHIBIOS)/os/lib/src/chmempools.c
+  TMK_COMMON_SRC += $(CHIBIOS)/os/lib/src/chfactory.c
+  TMK_COMMON_SRC += $(CHIBIOS)/os/lib/src/chmemcore.c
 endif
 
 ifeq ($(PLATFORM),ARM_ATSAM)

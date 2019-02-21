@@ -2,6 +2,14 @@
 
 #include "timer.h"
 
+#ifndef ST2MS
+#define ST2MS(n) (((n) * 1000UL + CH_CFG_ST_FREQUENCY - 1UL) / CH_CFG_ST_FREQUENCY)
+#endif
+#ifndef MS2ST
+#define MS2ST(msec) ((systime_t)((((msec) * CH_CFG_ST_FREQUENCY - 1L) / 1000L) + 1L))
+#endif
+
+
 static systime_t last_systime = 0;
 static systime_t overflow = 0;
 static uint32_t current_time_ms = 0;
