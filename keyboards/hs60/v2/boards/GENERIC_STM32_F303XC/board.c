@@ -17,12 +17,53 @@
 #include "hal.h"
 
 #if HAL_USE_PAL || defined(__DOXYGEN__)
+typedef struct {
+  uint32_t              moder;
+  uint32_t              otyper;
+  uint32_t              ospeedr;
+  uint32_t              pupdr;
+  uint32_t              odr;
+  uint32_t              afrl;
+  uint32_t              afrh;
+} gpio_setup_t;
+
 /**
- * @brief   PAL setup.
- * @details Digital I/O ports static configuration as defined in @p board.h.
- *          This variable is used by the HAL when initializing the PAL driver.
+ * @brief   Type of STM32 GPIO initialization data.
  */
-const PALConfig pal_default_config = {
+typedef struct {
+#if STM32_HAS_GPIOA || defined(__DOXYGEN__)
+  gpio_setup_t          PAData;
+#endif
+#if STM32_HAS_GPIOB || defined(__DOXYGEN__)
+  gpio_setup_t          PBData;
+#endif
+#if STM32_HAS_GPIOC || defined(__DOXYGEN__)
+  gpio_setup_t          PCData;
+#endif
+#if STM32_HAS_GPIOD || defined(__DOXYGEN__)
+  gpio_setup_t          PDData;
+#endif
+#if STM32_HAS_GPIOE || defined(__DOXYGEN__)
+  gpio_setup_t          PEData;
+#endif
+#if STM32_HAS_GPIOF || defined(__DOXYGEN__)
+  gpio_setup_t          PFData;
+#endif
+#if STM32_HAS_GPIOG || defined(__DOXYGEN__)
+  gpio_setup_t          PGData;
+#endif
+#if STM32_HAS_GPIOH || defined(__DOXYGEN__)
+  gpio_setup_t          PHData;
+#endif
+#if STM32_HAS_GPIOI || defined(__DOXYGEN__)
+  gpio_setup_t          PIData;
+#endif
+} gpio_config_t;
+
+/**
+ * @brief   STM32 GPIO static initialization data.
+ */
+static const gpio_config_t gpio_default_config = {
 #if STM32_HAS_GPIOA
   {VAL_GPIOA_MODER, VAL_GPIOA_OTYPER, VAL_GPIOA_OSPEEDR, VAL_GPIOA_PUPDR,
    VAL_GPIOA_ODR,   VAL_GPIOA_AFRL,   VAL_GPIOA_AFRH},
