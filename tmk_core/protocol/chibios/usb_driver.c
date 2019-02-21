@@ -125,6 +125,7 @@ static size_t _readt(void *ip, uint8_t *bp, size_t n, systime_t timeout) {
 }
 
 static const struct QMKUSBDriverVMT vmt = {
+  (size_t)0,
   _write, _read, _put, _get,
   _putt, _gett, _writet, _readt
 };
