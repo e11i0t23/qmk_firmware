@@ -104,30 +104,54 @@ static msg_t _get(void *ip) {
   return ibqGetTimeout(&((QMKUSBDriver *)ip)->ibqueue, TIME_INFINITE);
 }
 
-static msg_t _putt(void *ip, uint8_t b, systime_t timeout) {
+static msg_t _putt(void *ip, uint8_t b, sysinterval_t timeout) {
 
   return obqPutTimeout(&((QMKUSBDriver *)ip)->obqueue, b, timeout);
 }
 
-static msg_t _gett(void *ip, systime_t timeout) {
+static msg_t _gett(void *ip, sysinterval_t timeout) {
 
   return ibqGetTimeout(&((QMKUSBDriver *)ip)->ibqueue, timeout);
 }
 
-static size_t _writet(void *ip, const uint8_t *bp, size_t n, systime_t timeout) {
+static size_t _writet(void *ip, const uint8_t *bp, size_t n, sysinterval_t timeout) {
 
   return obqWriteTimeout(&((QMKUSBDriver *)ip)->obqueue, bp, n, timeout);
 }
 
-static size_t _readt(void *ip, uint8_t *bp, size_t n, systime_t timeout) {
+static size_t _readt(void *ip, uint8_t *bp, size_t n, sysinterval_t timeout) {
 
   return ibqReadTimeout(&((QMKUSBDriver *)ip)->ibqueue, bp, n, timeout);
+}
+
+static msg_t _ctl(void *ip, unsigned int operation, void *arg) {
+  QMKUSBDriver *sdp = (QMKUSBDriver *)ip;
+
+  osalDbgCheck(sdp != NULL);
+
+  switch (operation) {
+  case CHN_CTL_NOP:
+    osalDbgCheck(arg == NULL);
+    break;
+  case CHN_CTL_INVALID:
+    osalDbgAssert(false, "invalid CTL operation");
+    break;
+  default:
+#if defined(SD_LLD_IMPLEMENTS_CTL)
+    /* Delegating to the LLD if supported.*/
+    return sd_lld_control(sdp, operation, arg);
+#else
+    break;
+#endif
+  }
+  return MSG_OK;
 }
 
 static const struct QMKUSBDriverVMT vmt = {
   (size_t)0,
   _write, _read, _put, _get,
-  _putt, _gett, _writet, _readt
+  _putt, _gett, _writet, _readt,
+  _ctl
 };
 
 /**
