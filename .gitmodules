@@ -4,9 +4,9 @@
 [submodule "lib/googletest"]
 	path = lib/googletest
 	url = https://github.com/google/googletest
-[submodule "lib/chibios-contrib"]
-	path = lib/chibios-contrib
-	url = https://github.com/ChibiOS/ChibiOS-Contrib
 [submodule "lib/chibios"]
 	path = lib/chibios
 	url = https://github.com/e11i0t23/chibios
+[submodule "lib/chibios-contrib"]
+	path = lib/chibios-contrib
+	url = https://github.com/e11i0t23/ChibiOS-Contrib.git
