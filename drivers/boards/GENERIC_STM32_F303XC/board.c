@@ -1,12 +1,9 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
-
+    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
         http://www.apache.org/licenses/LICENSE-2.0
-
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +11,29 @@
     limitations under the License.
 */
 
-#include "hal.h"
+/*
+ * This file has been automatically generated using ChibiStudio board
+ * generator plugin. Do not edit manually.
+ */
 
-#if HAL_USE_PAL || defined(__DOXYGEN__)
+#include "hal.h"
+#include "stm32_gpio.h"
+
+/*===========================================================================*/
+/* Driver local definitions.                                                 */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Driver exported variables.                                                */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Driver local variables and types.                                         */
+/*===========================================================================*/
+
+/**
+ * @brief   Type of STM32 GPIO port setup.
+ */
 typedef struct {
   uint32_t              moder;
   uint32_t              otyper;
@@ -58,6 +75,12 @@ typedef struct {
 #if STM32_HAS_GPIOI || defined(__DOXYGEN__)
   gpio_setup_t          PIData;
 #endif
+#if STM32_HAS_GPIOJ || defined(__DOXYGEN__)
+  gpio_setup_t          PJData;
+#endif
+#if STM32_HAS_GPIOK || defined(__DOXYGEN__)
+  gpio_setup_t          PKData;
+#endif
 } gpio_config_t;
 
 /**
@@ -98,20 +121,78 @@ static const gpio_config_t gpio_default_config = {
 #endif
 #if STM32_HAS_GPIOI
   {VAL_GPIOI_MODER, VAL_GPIOI_OTYPER, VAL_GPIOI_OSPEEDR, VAL_GPIOI_PUPDR,
-   VAL_GPIOI_ODR,   VAL_GPIOI_AFRL,   VAL_GPIOI_AFRH}
+   VAL_GPIOI_ODR,   VAL_GPIOI_AFRL,   VAL_GPIOI_AFRH},
 #endif
 };
-#endif
 
-void enter_bootloader_mode_if_requested(void);
+/*===========================================================================*/
+/* Driver local functions.                                                   */
+/*===========================================================================*/
+
+static void gpio_init(stm32_gpio_t *gpiop, const gpio_setup_t *config) {
+
+  gpiop->OTYPER  = config->otyper;
+  gpiop->OSPEEDR = config->ospeedr;
+  gpiop->PUPDR   = config->pupdr;
+  gpiop->ODR     = config->odr;
+  gpiop->AFRL    = config->afrl;
+  gpiop->AFRH    = config->afrh;
+  gpiop->MODER   = config->moder;
+}
+
+static void stm32_gpio_init(void) {
+
+  /* Enabling GPIO-related clocks, the mask comes from the
+     registry header file.*/
+  rccResetAHB(STM32_GPIO_EN_MASK);
+  rccEnableAHB(STM32_GPIO_EN_MASK, true);
+
+  /* Initializing all the defined GPIO ports.*/
+#if STM32_HAS_GPIOA
+  gpio_init(GPIOA, &gpio_default_config.PAData);
+#endif
+#if STM32_HAS_GPIOB
+  gpio_init(GPIOB, &gpio_default_config.PBData);
+#endif
+#if STM32_HAS_GPIOC
+  gpio_init(GPIOC, &gpio_default_config.PCData);
+#endif
+#if STM32_HAS_GPIOD
+  gpio_init(GPIOD, &gpio_default_config.PDData);
+#endif
+#if STM32_HAS_GPIOE
+  gpio_init(GPIOE, &gpio_default_config.PEData);
+#endif
+#if STM32_HAS_GPIOF
+  gpio_init(GPIOF, &gpio_default_config.PFData);
+#endif
+#if STM32_HAS_GPIOG
+  gpio_init(GPIOG, &gpio_default_config.PGData);
+#endif
+#if STM32_HAS_GPIOH
+  gpio_init(GPIOH, &gpio_default_config.PHData);
+#endif
+#if STM32_HAS_GPIOI
+  gpio_init(GPIOI, &gpio_default_config.PIData);
+#endif
+}
+
+/*===========================================================================*/
+/* Driver interrupt handlers.                                                */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Driver exported functions.                                                */
+/*===========================================================================*/
 
 /**
  * @brief   Early initialization code.
- * @details This initialization must be performed just after stack setup
- *          and before any other initialization.
+ * @details GPIO ports and system clocks are initialized before everything
+ *          else.
  */
 void __early_init(void) {
-  enter_bootloader_mode_if_requested();
+
+  stm32_gpio_init();
   stm32_clock_init();
 }
 
@@ -164,4 +245,5 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
  * @todo    Add your board-specific code, if any.
  */
 void boardInit(void) {
+
 }
