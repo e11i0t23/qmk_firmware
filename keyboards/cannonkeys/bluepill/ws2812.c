@@ -45,10 +45,11 @@ static THD_FUNCTION(ledsThread, arg) {
 }
 
  static const SPIConfig spicfg = {
+  (size_t)0,
   NULL,
   PORT_WS2812,
   PIN_WS2812,
-  SPI_CR1_BR_1|SPI_CR1_BR_0 // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
+  PORTAB_SPI_CONFIG
 };
 
  /*

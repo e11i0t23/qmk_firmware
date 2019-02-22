@@ -57,6 +57,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PORT_WS2812     GPIOB
 #define PIN_WS2812      15
 #define WS2812_SPI SPID2
+#define PORTAB_SPI_CONFIG \
+SPI_CR1_BR_1|SPI_CR1_BR_0 // baudrate : fpclk / 8 => 1tick is 0.32us (2.25 MHz)
 
 
 /*
