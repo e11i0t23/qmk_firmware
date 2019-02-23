@@ -74,7 +74,7 @@ uint8_t i2c_transmit(uint8_t address, uint8_t* data, uint16_t length, uint16_t t
   i2c_address = address;
   i2cStart(&I2C_DRIVER, &i2cconfig);
   i2cAcquireBus(&I2C_DRIVER);
-  status = i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), data, length, 0, 0, MS2ST(timeout));
+  status = i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), data, length, 0, 0, TIME_MS2I(timeout));
   i2cReleaseBus(&I2C_DRIVER);
   return status;
 }
@@ -83,7 +83,7 @@ uint8_t i2c_receive(uint8_t address, uint8_t* data, uint16_t length, uint16_t ti
 {
   i2c_address = address;
   i2cStart(&I2C_DRIVER, &i2cconfig);
-  return i2cMasterReceiveTimeout(&I2C_DRIVER, (i2c_address >> 1), data, length, MS2ST(timeout));
+  return i2cMasterReceiveTimeout(&I2C_DRIVER, (i2c_address >> 1), data, length, TIME_MS2I(timeout));
 }
 
 uint8_t i2c_writeReg(uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t length, uint16_t timeout)
@@ -98,14 +98,14 @@ uint8_t i2c_writeReg(uint8_t devaddr, uint8_t regaddr, uint8_t* data, uint16_t l
   }
   complete_packet[0] = regaddr;
 
-  return i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), complete_packet, length + 1, 0, 0, MS2ST(timeout));
+  return i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), complete_packet, length + 1, 0, 0, TIME_MS2I(timeout));
 }
 
 uint8_t i2c_readReg(uint8_t devaddr, uint8_t* regaddr, uint8_t* data, uint16_t length, uint16_t timeout)
 {
   i2c_address = devaddr;
   i2cStart(&I2C_DRIVER, &i2cconfig);
-  return i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), regaddr, 1, data, length, MS2ST(timeout));
+  return i2cMasterTransmitTimeout(&I2C_DRIVER, (i2c_address >> 1), regaddr, 1, data, length, TIME_MS2I(timeout));
 }
 
 // This is usually not needed. It releases the driver to allow pins to become GPIO again.
