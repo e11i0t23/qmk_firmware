@@ -199,6 +199,8 @@ static void stm32_gpio_init(void) {
 /* Driver exported functions.                                                */
 /*===========================================================================*/
 
+void enter_bootloader_mode_if_requested(void);
+
 /**
  * @brief   Early initialization code.
  * @details GPIO ports and system clocks are initialized before everything
@@ -206,6 +208,7 @@ static void stm32_gpio_init(void) {
  */
 void __early_init(void) {
 
+  enter_bootloader_mode_if_requested();
   stm32_gpio_init();
   stm32_clock_init();
 }
@@ -259,5 +262,8 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
  * @todo    Add your board-specific code, if any.
  */
 void boardInit(void) {
-
+  SYSCFG->CFGR1 |= SYSCFG_CFGR1_I2C1_DMA_RMP;
+  SYSCFG->CFGR1 &= ~(SYSCFG_CFGR1_SPI2_DMA_RMP);
 }
+
+
