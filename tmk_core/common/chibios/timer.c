@@ -1,14 +1,15 @@
 #include "ch.h"
+
 #include "timer.h"
 
-
+/*
 #ifndef ST2MS
 #define ST2MS(n) (((n) * 1000UL + CH_CFG_ST_FREQUENCY - 1UL) / CH_CFG_ST_FREQUENCY)
 #endif
 #ifndef MS2ST
 #define MS2ST(msec) ((systime_t)((((msec) * CH_CFG_ST_FREQUENCY - 1L) / 1000L) + 1L))
 #endif
-
+*/
 
 
 static systime_t last_systime = 0;
@@ -33,9 +34,9 @@ uint32_t timer_read32(void) {
   // Note: We assume that the timer update is called at least once betweeen every wrap around of the system time
   systime_t current_systime = chVTGetSystemTime();
   systime_t elapsed = current_systime - last_systime + overflow;
-  uint32_t elapsed_ms = ST2MS(elapsed);
+  uint32_t elapsed_ms = TIME_I2MS(elapsed);
   current_time_ms += elapsed_ms;
-  overflow = elapsed - MS2ST(elapsed_ms);
+  overflow = elapsed - TIME_MS2I(elapsed_ms);
   last_systime = current_systime;
 
   return current_time_ms;
