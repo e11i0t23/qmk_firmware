@@ -216,28 +216,6 @@ static const dacsample_t dac_buffer_2[DAC_BUFFER_SIZE] = {
   [0                 ... DAC_BUFFER_SIZE/2-1] = 0,
   [DAC_BUFFER_SIZE/2 ... DAC_BUFFER_SIZE  -1] = DAC_SAMPLE_MAX,
 };
-
-/*
- * DAC streaming callback.
- */
-size_t nx = 0, ny = 0, nz = 0;
-static void end_cb1(DACDriver *dacp, dacsample_t *buffer, size_t n) {
-
-  (void)dacp;
-
-  nz++;
-  if (dac_buffer == buffer) {
-    nx += n;
-  }
-  else {
-    ny += n;
-  }
-
-  if ((nz % 1000) == 0) {
-    // palTogglePad(GPIOD, GPIOD_LED3);
-  }
-}
-
 /*
  * DAC error callback.
  */
@@ -256,7 +234,6 @@ static const DACConfig dac1cfg1 = {
 
 static const DACConversionGroup dacgrpcfg1 = {
   .num_channels = 1U,
-  .end_cb       = end_cb1,
   .error_cb     = error_cb1,
   .trigger      = DAC_TRG(0)
 };
@@ -268,7 +245,6 @@ static const DACConfig dac1cfg2 = {
 
 static const DACConversionGroup dacgrpcfg2 = {
   .num_channels = 1U,
-  .end_cb       = end_cb1,
   .error_cb     = error_cb1,
   .trigger      = DAC_TRG(0)
 };
