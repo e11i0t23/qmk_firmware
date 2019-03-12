@@ -1,8 +1,8 @@
 # ep46
 
-![ep46](https://i.imgur.com/)
+![eb46](https://i.imgur.com/)
 
-A simple 40% keyboard
+Description
 
 Keyboard Maintainer: [Elliot Powell](https://github.com/e11i0t23), [/u/e11i0t23 on reddit](https://reddit.com/u/e11i0t23)  
 Hardware Supported: EB46 PCB  
