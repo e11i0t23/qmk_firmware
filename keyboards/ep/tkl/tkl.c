@@ -59,43 +59,6 @@ static const ADCConversionGroup adcgrpcfg1 = {
   ADC_CHSELR_CHSEL13                                /* CHSELR */
 };
 
-bool eeprom_is_valid(void)
-{
-	return (eeprom_read_word(((void*)EEPROM_MAGIC_ADDR)) == EEPROM_MAGIC &&
-			eeprom_read_byte(((void*)EEPROM_VERSION_ADDR)) == EEPROM_VERSION);
-}
-
-void eeprom_set_valid(bool valid)
-{
-	eeprom_update_word(((void*)EEPROM_MAGIC_ADDR), valid ? EEPROM_MAGIC : 0xFFFF);
-	eeprom_update_byte(((void*)EEPROM_VERSION_ADDR), valid ? EEPROM_VERSION : 0xFF);
-}
-
-void eeprom_reset(void)
-{
-	eeprom_set_valid(false);
-	eeconfig_disable();
-}
-
-void save_backlight_config_to_eeprom(){
-  eeprom_update_byte((uint8_t*)EEPROM_CUSTOM_BACKLIGHT, kb_backlight_config.raw);
-}
-
-void load_custom_config(){
-  //kb_backlight_config.raw = eeprom_read_byte((uint8_t*)EEPROM_CUSTOM_BACKLIGHT);
-}
-
-void eeprom_init_kb(void)
-{
-	// If the EEPROM has the magic, the data is good.
-	// OK to load from EEPROM.
-	if (eeprom_is_valid()) {
-		load_custom_config();
-	} else	{
-		// Save the magic number last, in case saving was interrupted
-		eeprom_set_valid(true);
-	}
-}
 
 #ifdef RAW_ENABLE
 
@@ -123,18 +86,6 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
           command_data[3] = (value >> 8 ) & 0xFF;
           command_data[4] = value & 0xFF;
           break;
-        }
-        case id_oled_default_mode:
-        {
-          uint8_t default_oled = eeprom_read_byte((uint8_t*)DYNAMIC_KEYMAP_DEFAULT_OLED);
-          command_data[1] = default_oled;
-          break;
-        }
-        case id_oled_mode:
-        {
-          command_data[1] = oled_mode;
-          break;
-
         }
         case id_encoder_modes:
         {
@@ -164,28 +115,6 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
     case id_set_keyboard_value:
     {
       switch(command_data[0]){
-        case id_oled_default_mode:
-        {
-          eeprom_update_byte((uint8_t*)DYNAMIC_KEYMAP_DEFAULT_OLED, command_data[1]);
-          break;
-        }
-        case id_oled_mode:
-        {
-          oled_mode = command_data[1];
-          draw_ui();
-          break;
-        }
-        case id_encoder_modes:
-        {
-          enabled_encoder_modes = command_data[1];
-          eeprom_update_byte((uint8_t*)DYNAMIC_KEYMAP_ENABLED_ENCODER_MODES, enabled_encoder_modes);
-          break;
-        }
-        case id_encoder_custom:
-        {
-          // uint8_t custom_encoder_idx = command_data[1];
-          break;
-        }
         default:
         {
           *command_id = id_unhandled;
@@ -291,29 +220,26 @@ void raw_hid_receive( uint8_t *data, uint8_t length )
 }
 
 #endif
+
 uint32_t layer_state_set_kb(uint32_t state) {
   state = layer_state_set_user(state);
   layer = biton32(state);
   return state;
 }
 
-void matrix_init_kb(void){
+void matrix_init_custom(void){
 	palSetGroupMode(GPIOC, PAL_PORT_BIT(3),0, PAL_MODE_INPUT_ANALOG);
-	palSetPadMode(PORT_WS2812, PIN_WS2812, PAL_MODE_ALTERNATE(0));
+	//palSetPadMode(PORT_WS2812, PIN_WS2812, PAL_MODE_ALTERNATE(0));
 	wait_ms(500);
 	//ADC->CCR |= ADC_CCR_VREFEN;
 	adcStart(&ADCD1, NULL);
 	//midi_device_init(&midi_dev);
 	//midi_device_process(&midi_dev);
 	//midi_send_start(&midi_device);
-	eeprom_init_kb();
-#ifdef RGBLIGHT_ENABLE
-    leds_init();
-#endif
 }
 
 
-void matrix_scan_kb(void) {
+void matrix_scan_custom(void) {
 	if(scanNo == 0){
 
 		adcConvert(&ADCD1, &adcgrpcfg1, samples1, ADC_GRP1_BUF_DEPTH);
@@ -333,9 +259,6 @@ void matrix_scan_kb(void) {
 	}else{
 		scanNo += 1;
 	}
-#ifdef RGBLIGHT_ENABLE
-    rgblight_task();
-#endif
 }
 
 void encoder_update_kb(uint8_t index, bool clockwise) {
@@ -354,9 +277,3 @@ void encoder_update_kb(uint8_t index, bool clockwise) {
       }
   }
 }
-
-
-
-
-
-

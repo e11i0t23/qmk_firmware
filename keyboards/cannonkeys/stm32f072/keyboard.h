@@ -21,3 +21,7 @@ void breathing_enable(void);
 void breathing_disable(void);
 void load_custom_config(void);
 void save_backlight_config_to_eeprom(void);
+
+extern void matrix_init_custom(void);
+extern void matrix_scan_custom(void);
+void eeprom_reset(void);

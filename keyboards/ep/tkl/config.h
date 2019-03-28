@@ -46,33 +46,31 @@
 
 #define RGBLIGHT_ANIMATIONS
 
-#define WS2812_LED_N 14
+#define WS2812_LED_N 88
 #define RGBLED_NUM WS2812_LED_N
 #define PORT_WS2812     GPIOA
 #define PIN_WS2812      7
 #define WS2812_SPI SPID1
+#define RGBLIGHT_LIMIT_VAL 175
 
-#define BACKLIGHT_LEVELS 0
-#define BACKLIGHT_BREATHING
-#define BREATHING_PERIOD 6
-
-
-// EEPROM usage
 // TODO: refactor with new user EEPROM code (coming soon)
 #define EEPROM_MAGIC 0x451F
 #define EEPROM_MAGIC_ADDR 32
 // Bump this every time we change what we store
 // This will automatically reset the EEPROM with defaults
 // and avoid loading invalid data from the EEPROM
-#define EEPROM_VERSION 0x01
+#define EEPROM_VERSION 0x08
 #define EEPROM_VERSION_ADDR 34
 
-#define EEPROM_CUSTOM_BACKLIGHT 804
-
+// Backlight config starts after EEPROM version
+#define RGB_BACKLIGHT_CONFIG_EEPROM_ADDR 35
+// Dynamic keymap starts after backlight config (35+32)
+#define DYNAMIC_KEYMAP_EEPROM_ADDR 67
 #define DYNAMIC_KEYMAP_LAYER_COUNT 4
-
-// Dynamic keymap starts after EEPROM version
-#define DYNAMIC_KEYMAP_EEPROM_ADDR 35
+// Dynamic macro starts after dynamic keymaps (67+(4*5*14*2)) = (67+560)
+#define DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR 627
+#define DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE 398
+#define DYNAMIC_KEYMAP_MACRO_COUNT 16
 
 // Dynamic macro starts after dynamic keymaps (35+(4*6*16*2)) = (35+768) = 803
 
@@ -83,15 +81,7 @@
 // 6 for 3x custom encoder settings, left, right, and press (18 total)
 
 #define DYNAMIC_KEYMAP_ENABLED_ENCODER_MODES 803
-#define DYNAMIC_KEYMAP_CUSTOM_BACKLIGHT 804
-#define DYNAMIC_KEYMAP_DEFAULT_OLED 805
 #define DYNAMIC_KEYMAP_CUSTOM_ENCODER 806
-
-#define DYNAMIC_KEYMAP_MACRO_EEPROM_ADDR 824
-#define DYNAMIC_KEYMAP_MACRO_EEPROM_SIZE 200
-#define DYNAMIC_KEYMAP_MACRO_COUNT 16
-
-
 
 /*
  * Feature disable options

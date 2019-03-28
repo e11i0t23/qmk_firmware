@@ -48,4 +48,7 @@ uint16_t handle_encoder_press(void);
 extern uint8_t layer;
 
 
-
+enum eptkl_keyboard_value_id {
+  id_encoder_modes = 0x80,
+  id_encoder_custom,
+};

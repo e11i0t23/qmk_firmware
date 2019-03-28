@@ -9,11 +9,13 @@
 
 #include "ws2812.h"
 
+#ifdef BACKLIGHT_ENABLE
 backlight_config_t kb_backlight_config = {
   .enable = true,
   .breathing = true,
   .level = BACKLIGHT_LEVELS
 };
+#endif
 
 
 bool eeprom_is_valid(void)
@@ -35,11 +37,15 @@ void eeprom_reset(void)
 }
 
 void save_backlight_config_to_eeprom(){
+#ifdef BACKLIGHT_ENABLE
   eeprom_update_byte((uint8_t*)EEPROM_CUSTOM_BACKLIGHT, kb_backlight_config.raw);
+#endif
 }
 
 void load_custom_config(){
+#ifdef BACKLIGHT_ENABLE
   kb_backlight_config.raw = eeprom_read_byte((uint8_t*)EEPROM_CUSTOM_BACKLIGHT);
+#endif
 }
 
 void eeprom_init_kb(void)
@@ -57,13 +63,17 @@ void eeprom_init_kb(void)
 void matrix_init_kb(void){
   	eeprom_init_kb();
       /* MOSI pin*/
-    palSetPadMode(PORT_WS2812, PIN_WS2812, PAL_MODE_ALTERNATE(0));
     wait_ms(500);
 
+    matrix_init_custom();
+
 #ifdef RGBLIGHT_ENABLE
+    palSetPadMode(PORT_WS2812, PIN_WS2812, PAL_MODE_ALTERNATE(0));
     leds_init();
 #endif
+#ifdef BACKLIGHT_ENABLE
     backlight_init_ports();
+#endif
 }
 
 void matrix_scan_kb(void)
@@ -71,10 +81,13 @@ void matrix_scan_kb(void)
   #ifdef RGBLIGHT_ENABLE
     rgblight_task();
   #endif
+
+    matrix_scan_custom();
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
+#ifdef BACKLIGHT_ENABLE
     case BL_INC:
       if (record->event.pressed) {
         kb_backlight_config.level = kb_backlight_config.level + 1;
@@ -115,6 +128,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
         save_backlight_config_to_eeprom();
       }
       return false;
+#endif
   }
   return true;
 }
