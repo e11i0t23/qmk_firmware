@@ -4,7 +4,7 @@
 #define VENDOR_ID       0xFEED
 #define PRODUCT_ID      0x6060
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    Elliot Powell
+#define MANUFACTURER    AKB
 #define PRODUCT         Raine M3
 #define DESCRIPTION     Raine M3
 
