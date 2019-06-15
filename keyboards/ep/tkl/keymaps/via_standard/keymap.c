@@ -24,6 +24,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define _BASE 0
 #define _FN1 1
 
+void keyboard_post_init_user(){
+    debug_enable = true;
+    debug_matrix = true;
+    debug_keyboard = true;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // If console is enabled, it will print the matrix position and status of each key pressed
+    if(keycode == KC_SLASH){
+        print("SLASH PLEASE");
+        SEND_STRING("/");
+    }
+    print("Key Pressed");
+    printf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
+
+  return true;
+}
+
+void encoder_update_user(uint8_t index, bool clockwise) {
+  if (index == 0) { /* First encoder */
+    if (clockwise) {
+      tap_code(KC_PGDN);
+    } else {
+      tap_code(KC_PGUP);
+    }
+  }
+}
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_BASE] = LAYOUT( \
         KC_ESC, KC_ESC,             KC_F1,    KC_F2,  KC_F3,  KC_F4,  KC_F5,  KC_F6,  KC_F7,  KC_F8,  KC_F9,   KC_F10,   KC_F11,   KC_F12,       KC_PSCR,  LT(1, KC_SLCK),  MT(MOD_LCTL, KC_PAUSE),\
@@ -42,29 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             KC_LCTL,  KC_LGUI,  KC_LALT,                        KC_SPC,                          KC_RALT,  KC_RGUI,  KC_APP,   KC_RCTL,      KC_LEFT,  KC_VOLD,  RESET \
 )
 };
-void keyboard_post_init_user(){
-    debug_enable = true;
-    debug_matrix = true;
-    debug_keyboard = true;
-}
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  // If console is enabled, it will print the matrix position and status of each key pressed
-#ifdef CONSOLE_ENABLE
-    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
-#endif
-  return true;
-}
-
-void encoder_update_user(uint8_t index, bool clockwise) {
-  if (index == 0) { /* First encoder */
-    if (clockwise) {
-      tap_code(KC_PGDN);
-    } else {
-      tap_code(KC_PGUP);
-    }
-  }
-}
 
 
 
