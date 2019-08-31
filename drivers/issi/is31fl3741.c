@@ -79,7 +79,7 @@ uint8_t g_twi_transfer_buffer[20];
 uint8_t g_pwm_buffer[DRIVER_COUNT][192];
 bool g_pwm_buffer_update_required[DRIVER_COUNT] = { false };
 
-uint8_t g_led_control_registers[DRIVER_COUNT][24] = { { 0 }, { 0 } };
+uint8_t g_led_control_registers[DRIVER_COUNT][24] = { { 0 } };
 bool g_led_control_registers_update_required[DRIVER_COUNT] = { false };
 
 void IS31FL3741_write_register( uint8_t addr, uint8_t reg, uint8_t data )
@@ -141,7 +141,7 @@ void IS31FL3741_init( uint8_t addr, uint8_t sync)
     // Turn off all LEDs.
     for ( int i = 0x00; i <= 0xB3; i++ )
     {
-        IS31FL3741_write_register( addr, i, 0x00 );
+        IS31FL3741_write_register( addr, i, 0x19 );
     }
 
     // Unlock the command register.
@@ -153,7 +153,7 @@ void IS31FL3741_init( uint8_t addr, uint8_t sync)
     // No need to setup Breath registers to PWM as that is the default.
     for ( int i = 0x00; i <= 0xAA; i++ )
     {
-        IS31FL3741_write_register( addr, i, 0x00 );
+        IS31FL3741_write_register( addr, i, 0x19 );
     }
 
     // Unlock the command register.
