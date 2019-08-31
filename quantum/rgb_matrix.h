@@ -34,6 +34,8 @@
   #include "is31fl3737.h"
 #elif defined (WS2812)
   #include "ws2812.h"
+#elif defined (IS31FL3741)
+  #include "is31fl3741.h"
 #endif
 
 #ifndef RGB_MATRIX_LED_FLUSH_LIMIT
