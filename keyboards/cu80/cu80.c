@@ -15,6 +15,9 @@
  */
 #include "cu80.h"
 #include "config.h"
+#include <print.h>
+#include "is31fl3741.h"
+#include "i2c_master.h"
 
 const is31_led g_is31_leds[DRIVER_LED_TOTAL] = {
 /* Refer to IS31 manual for these locations
@@ -107,9 +110,19 @@ led_config_t g_led_config = { {
     1, 1, 1, 1, 1, 1
 } };
 
+uint8_t data[8];
 
 void matrix_init_kb(void) {
+    i2c_init();
+    if (i2c_readReg(0b1100001, 0xfc, data, 8, 100) == -2) {
+        print("\nFAAAAAIIIIILLLLLEEEEEED\n");
+    }else{
+       print("woooooooo");
+    }
+    print("i2c user");
+    IS31FL3741_init( DRIVER_ADDR_1, 0);
     matrix_init_user();
+    print("test");
 }
 void matrix_scan_kb(void) {
     matrix_scan_user();

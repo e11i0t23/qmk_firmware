@@ -29,6 +29,7 @@
 #include <string.h>
 #include "i2c_master.h"
 #include "progmem.h"
+#include <print.h>
 
 // This is a 7-bit address, that gets left-shifted and bit 0
 // set to 0 for write, 1 for read (as per I2C protocol)
@@ -89,11 +90,18 @@ void IS31FL3741_write_register( uint8_t addr, uint8_t reg, uint8_t data )
 
   #if ISSI_PERSISTENCE > 0
     for (uint8_t i = 0; i < ISSI_PERSISTENCE; i++) {
-      if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 2, ISSI_TIMEOUT) == 0)
+      if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 2, ISSI_TIMEOUT) == 0){
+        print("breaking");
         break;
+      }
+      else print("errs");
     }
   #else
-    i2c_transmit(addr << 1, g_twi_transfer_buffer, 2, ISSI_TIMEOUT);
+    if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 2, ISSI_TIMEOUT) == -2)
+        print("-2");
+    else if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 2, ISSI_TIMEOUT) == -1)
+        print("-1");
+    else print("0");
   #endif
 }
 
@@ -105,28 +113,29 @@ void IS31FL3741_write_pwm_buffer( uint8_t addr, uint8_t *pwm_buffer )
     // g_twi_transfer_buffer[] is 20 bytes
 
     // iterate over the pwm_buffer contents at 16 byte intervals
-    for ( int i = 0; i < 192; i += 16 ) {
-        g_twi_transfer_buffer[0] = i;
-        // copy the data from i to i+15
-        // device will auto-increment register for data after the first byte
-        // thus this sets registers 0x00-0x0F, 0x10-0x1F, etc. in one transfer
-        for ( int j = 0; j < 16; j++ ) {
-            g_twi_transfer_buffer[1 + j] = pwm_buffer[i + j];
-        }
+    // for ( int i = 0; i < 192; i += 16 ) {
+    //     g_twi_transfer_buffer[0] = i;
+    //     // copy the data from i to i+15
+    //     // device will auto-increment register for data after the first byte
+    //     // thus this sets registers 0x00-0x0F, 0x10-0x1F, etc. in one transfer
+    //     for ( int j = 0; j < 16; j++ ) {
+    //         g_twi_transfer_buffer[1 + j] = pwm_buffer[i + j];
+    //     }
 
-    #if ISSI_PERSISTENCE > 0
-      for (uint8_t i = 0; i < ISSI_PERSISTENCE; i++) {
-        if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 17, ISSI_TIMEOUT) == 0)
-          break;
-      }
-    #else
-      i2c_transmit(addr << 1, g_twi_transfer_buffer, 17, ISSI_TIMEOUT);
-    #endif
-    }
+    // #if ISSI_PERSISTENCE > 0
+    //   for (uint8_t i = 0; i < ISSI_PERSISTENCE; i++) {
+    //     if (i2c_transmit(addr << 1, g_twi_transfer_buffer, 17, ISSI_TIMEOUT) == 0)
+    //       break;
+    //   }
+    // #else
+    //   i2c_transmit(addr << 1, g_twi_transfer_buffer, 17, ISSI_TIMEOUT);
+    // #endif
+    // }
 }
 
 void IS31FL3741_init( uint8_t addr, uint8_t sync)
 {
+    print("init");
     // In order to avoid the LEDs being driven with garbage data
     // in the LED driver's PWM registers, shutdown is enabled last.
     // Set up the mode and other settings, clear the PWM registers,
@@ -135,7 +144,7 @@ void IS31FL3741_init( uint8_t addr, uint8_t sync)
 
     // Unlock the command register.
     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5 );
-
+    print("first reg");
     // Select PG0
     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER, ISSI_PAGE_LEDCONTROL );
     // Turn off all LEDs.
@@ -227,28 +236,28 @@ void IS31FL3741_set_led_control_register( uint8_t index, bool red, bool green, b
 
 void IS31FL3741_update_pwm_buffers( uint8_t addr, uint8_t index )
 {
-    if ( g_pwm_buffer_update_required[index] )
-    {
-        // Firstly we need to unlock the command register and select PG1
-        IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5 );
-        IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER, ISSI_PAGE_PWM );
+    // if ( g_pwm_buffer_update_required[index] )
+    // {
+    //     // Firstly we need to unlock the command register and select PG1
+    //     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5 );
+    //     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER, ISSI_PAGE_PWM );
 
-        IS31FL3741_write_pwm_buffer( addr, g_pwm_buffer[index] );
-    }
-    g_pwm_buffer_update_required[index] = false;
+    //     IS31FL3741_write_pwm_buffer( addr, g_pwm_buffer[index] );
+    // }
+    // g_pwm_buffer_update_required[index] = false;
 }
 
 void IS31FL3741_update_led_control_registers( uint8_t addr, uint8_t index )
 {
-    if ( g_led_control_registers_update_required[index] )
-    {
-        // Firstly we need to unlock the command register and select PG0
-        IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5 );
-        IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER, ISSI_PAGE_LEDCONTROL );
-        for ( int i=0; i<24; i++ )
-        {
-            IS31FL3741_write_register(addr, i, g_led_control_registers[index][i] );
-        }
-    }
-    g_led_control_registers_update_required[index] = false;
+    // if ( g_led_control_registers_update_required[index] )
+    // {
+    //     // Firstly we need to unlock the command register and select PG0
+    //     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER_WRITELOCK, 0xC5 );
+    //     IS31FL3741_write_register( addr, ISSI_COMMANDREGISTER, ISSI_PAGE_LEDCONTROL );
+    //     for ( int i=0; i<24; i++ )
+    //     {
+    //         IS31FL3741_write_register(addr, i, g_led_control_registers[index][i] );
+    //     }
+    // }
+    // g_led_control_registers_update_required[index] = false;
 }

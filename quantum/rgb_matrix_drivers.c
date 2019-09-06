@@ -15,6 +15,7 @@
  */
 
 #include "rgb_matrix.h"
+#include <print.h>
 
 /* Each driver needs to define the struct
  *    const rgb_matrix_driver_t rgb_matrix_driver;
@@ -29,6 +30,7 @@
 
 static void init( void )
 {
+    print("i2c_init");
     i2c_init();
 #ifdef IS31FL3731
     IS31FL3731_init( DRIVER_ADDR_1 );
@@ -36,6 +38,7 @@ static void init( void )
 #elif defined(IS31FL3733)
     IS31FL3733_init( DRIVER_ADDR_1, 0 );
 #elif defined(IS31FL3741)
+    print("is31");
     IS31FL3741_init( DRIVER_ADDR_1, 0 );
 #else
     IS31FL3737_init( DRIVER_ADDR_1 );
