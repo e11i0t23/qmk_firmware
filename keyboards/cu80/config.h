@@ -56,10 +56,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Locking resynchronize hack */
 #define LOCKING_RESYNC_ENABLE
 
-#define RGB_DISABLE_AFTER_TIMEOUT 0 // number of ticks to wait until disabling effects
-#define RGB_DISABLE_WHEN_USB_SUSPENDED true // turn off effects when suspended
-#define DRIVER_ADDR_1 0b110000
+// #define RGB_DISABLE_AFTER_TIMEOUT 0 // number of ticks to wait until disabling effects
+// #define RGB_DISABLE_WHEN_USB_SUSPENDED true // turn off effects when suspended
+// #define DRIVER_ADDR_1 0b110000
 
-#define DRIVER_LED_TOTAL 54
+// #define DRIVER_LED_TOTAL 54
 
-#define DRIVER_COUNT 1
+// #define DRIVER_COUNT 1
+
+#define RGB_DI_PIN D1
+#define RGBLED_NUM 88
+
+#define RGBLIGHT_LIMIT_VAL 50
