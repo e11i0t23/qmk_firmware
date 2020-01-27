@@ -1,4 +1,4 @@
-#include "lets_split_eh.h"
+#include "lets_split_hs.h"
 
 #ifdef SWAP_HANDS_ENABLE
 __attribute__ ((weak))

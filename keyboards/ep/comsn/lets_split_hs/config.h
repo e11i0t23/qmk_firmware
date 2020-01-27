@@ -34,10 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCE 5
-
-#pragma once
-
-#include "config_common.h"
+#define USE_SERIAL
 
 /* Let's Split EH? pin-out */
 #define MATRIX_ROW_PINS { F1, F0, B7, F5 }
@@ -55,7 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Split Defines */
 #define SPLIT_HAND_PIN D4
 #define SOFT_SERIAL_PIN E6
+#define SPLIT_USB_DETECT
+#define SELECT_SOFT_SERIAL_SPEED 2
 
-// The 'EH' has previously forced use of I2C so this default has been kept
-// however users can undef to use serial
-#undef USE_I2C
