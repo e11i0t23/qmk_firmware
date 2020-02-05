@@ -38,7 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* Let's Split EH? pin-out */
 #define MATRIX_ROW_PINS { F1, F0, B7, F5 }
-#define MATRIX_COL_PINS { F4, F7, B3, B2, B1, B0 }
+#define MATRIX_COL_PINS { F4, D5, B3, B2, B1, B0 }
 #define UNUSED_PINS
 
 #define DIODE_DIRECTION COL2ROW
