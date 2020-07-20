@@ -48,9 +48,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLED_NUM 20    // Number of LEDs (each hand)
 #define RGBLED_SPLIT { 10, 10 }
 #define RGBLIGHT_ANIMATIONS
+#define RGBLIGHT_LIMIT_VAL 160
 
 /* Split Defines */
-#define SPLIT_HAND_PIN D4
+#define EE_HANDS
 #define SOFT_SERIAL_PIN E6
 #define SPLIT_USB_DETECT
 #define SELECT_SOFT_SERIAL_SPEED 2
