@@ -15,13 +15,19 @@
  */
 #include "mollydooker2.h"
 #include "i2c_master.h"
+#include <print.h>
 
+#define I2CA (0x20 << 1)
+int stats = 0;
 void matrix_init_kb(void) {
 	// put your keyboard start-up code here
 	// runs once when the firmware starts up
+    dprint("test");
     i2c_init();
-    i2c_start(0b0100000, 1);
-    i2c_write(0b11110001, 1000);
+    i2c_status_t status = i2c_start(I2CA, 500);
+    if (status == -1) stats = 1;
+    //i2c_write(0b11110001, 1000);
+    //i2c_transmit(I2CA, 0xF1, 8, 1000);
 
 	matrix_init_user();
 }
@@ -29,14 +35,14 @@ void matrix_init_kb(void) {
 void matrix_scan_kb(void) {
 	// put your looping keyboard code here
 	// runs every cycle (a lot)
-
+    if (stats == 1) uprintf("1", stats);
 	matrix_scan_user();
 }
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
 	// put your per-action keyboard code here
 	// runs for every action, just before processing by the firmware
-
+    uprintf("KL: kc: %u, col: %u, row: %u, pressed: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed);
 	return process_record_user(keycode, record);
 }
 
