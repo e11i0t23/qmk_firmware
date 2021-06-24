@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config_common.h"
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID    0xFEED
-#define PRODUCT_ID   0x0000
+#define VENDOR_ID    0xDECE
+#define PRODUCT_ID   0x001F
 #define DEVICE_VER   0x0001
 #define MANUFACTURER Elliot Powell
-#define PRODUCT      mc_enc
+#define PRODUCT      MacroPad
 
 /* key matrix size */
 #define MATRIX_ROWS 1
@@ -40,11 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
  *
  */
-#define MATRIX_ROW_PINS {  }
-#define MATRIX_COL_PINS { }
-#define DIRECT_PINS { \
-    { D5 } \
-}
+#define MATRIX_ROW_PINS { D3 }
+#define MATRIX_COL_PINS { D5 }
 #define UNUSED_PINS
 
 /* COL2ROW, ROW2COL */
@@ -52,21 +49,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define ENCODERS_PAD_A { C6 }
 #define ENCODERS_PAD_B { D4 }
+#define ENCODER_RESOLUTION 2
+
+#define TAPPING_TERM 175
 
 #define RGB_DI_PIN B3
 #ifdef RGB_DI_PIN
+#    define RGBLIGHT_DEFAULT_MODE RGBLIGHT_EFFECT_RAINBOW_SWIRL+1
 #    define RGBLED_NUM 30
 #    define RGBLIGHT_HUE_STEP 8
 #    define RGBLIGHT_SAT_STEP 8
 #    define RGBLIGHT_VAL_STEP 8
-#    define RGBLIGHT_LIMIT_VAL 150 /* The maximum brightness level */
+#    define RGBLIGHT_LIMIT_VAL 127 /* The maximum brightness level */
 #    define RGBLIGHT_SLEEP  /* If defined, the RGB lighting will be switched off when the host goes to sleep */
 /*== all animations enable ==*/
-#    define RGBLIGHT_ANIMATIONS
+//#    define RGBLIGHT_ANIMATIONS
 /*== or choose animations ==*/
 //#    define RGBLIGHT_EFFECT_BREATHING
 //#    define RGBLIGHT_EFFECT_RAINBOW_MOOD
-//#    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
+#    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
 //#    define RGBLIGHT_EFFECT_SNAKE
 //#    define RGBLIGHT_EFFECT_KNIGHT
 //#    define RGBLIGHT_EFFECT_CHRISTMAS

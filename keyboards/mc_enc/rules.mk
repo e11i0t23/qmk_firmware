@@ -2,7 +2,7 @@
 MCU = atmega32u4
 
 # Bootloader selection
-BOOTLOADER = atmel-dfu
+BOOTLOADER = caterina
 
 # Build Options
 #   change yes to no to disable
@@ -22,3 +22,4 @@ BLUETOOTH_ENABLE = no       # Enable Bluetooth
 AUDIO_ENABLE = no           # Audio output
 ENCODER_ENABLE = yes
 RGBLIGHT_ENABLE = yes
+TAP_DANCE_ENABLE = no
