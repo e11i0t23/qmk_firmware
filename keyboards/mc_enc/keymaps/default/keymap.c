@@ -20,9 +20,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [0] = LAYOUT(
         LT(1, KC_MUTE)
-    ),
-    [1] = LAYOUT(
-        KC_TRNS
     )
 };
 
@@ -31,7 +28,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         switch(biton32(layer_state)){
             case 1:
                 if (clockwise) {
-                    tap_code(KC_UP);
+                    tap_code16(G(S(KC_A)));
                 } else {
                     tap_code(KC_DOWN);
                 }
