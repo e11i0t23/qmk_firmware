@@ -93,3 +93,19 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     rgblight_set_layer_state(1, layer_state_cmp(state, 0));
     return state;
 }
+
+#ifdef OLED_DRIVER_ENABLE
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_180;
+}
+
+void render_default_layer_state(void) {
+    oled_write_P(PSTR("Layout: "), false);
+    switch (get_highest_layer(default_layer_state)) {
+        case 0:
+            oled_write_ln_P(PSTR("Layer 0"), false);
+            break;
+    }
+}
+#endif

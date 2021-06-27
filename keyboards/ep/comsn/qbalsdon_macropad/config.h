@@ -154,3 +154,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCODERS_PAD_A { F6, B1, B6 }
 #define ENCODERS_PAD_B { F7, B3, B2 }
 #define ENCODER_RESOLUTION 2
+
+#define OLED_DISPLAY_128X64
