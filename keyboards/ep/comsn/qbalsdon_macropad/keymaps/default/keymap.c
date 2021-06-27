@@ -19,7 +19,7 @@
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [0] = LAYOUT(
-                 KC_2,    KC_3,     KC_4,   KC_5,
+                 KC_2,    KC_3,     KC_4,   LT(1, KC_MUTE),
                           KC_3,    KC_4,     KC_5,
         KC_1,    KC_2,    KC_3,     KC_4,   KC_5,
         KC_1,    KC_2,    KC_3,     KC_4,   KC_5,
@@ -42,12 +42,24 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
         } else {
             tap_code(KC_UP);
         }
-    } else if (index == 2) { /* Second encoder */
-        if (clockwise) {
-            tap_code(KC_VOLU);
-        } else {
-            tap_code(KC_VOLD);
-        }
+    } else if (index == 2) { /* Third encoder */
+// example of how to have encoder actions be layer dependent
+        switch(biton32(layer_state)){
+            case 1:
+                if (clockwise) {
+                tap_code(KC_UP);
+                } else {
+                tap_code(KC_DOWN);
+                }
+                break;
+            default:
+                if (clockwise){
+                    tap_code(KC_VOLU);
+                } else{
+                    tap_code(KC_VOLD);
+                }
+                break;
+      }
     }
     return true;
 }
