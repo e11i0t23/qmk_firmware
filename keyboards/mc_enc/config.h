@@ -51,8 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCODERS_PAD_B { D4 }
 #define ENCODER_RESOLUTION 2
 
-#define TAPPING_TERM 175
-
 #define RGB_DI_PIN B3
 #ifdef RGB_DI_PIN
 #    define RGBLIGHT_DEFAULT_MODE RGBLIGHT_EFFECT_RAINBOW_SWIRL+1
