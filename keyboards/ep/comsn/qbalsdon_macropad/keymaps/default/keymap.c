@@ -15,6 +15,15 @@
  */
 #include QMK_KEYBOARD_H
 
+enum custom_keycodes {
+    NEWSKETCH = SAFE_RANGE,
+    MIRROR,
+    INSERTDXF,
+    NEWCOMPONENT,
+    CHAMFER,
+    ROTATE
+};
+
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
@@ -39,9 +48,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [2] = LAYOUT(
                     KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
                                 TO(0),       TO(1),     TO(2),
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
+// newsketce, line, retangle, circle, dimension
+        NEWSKETCH,    KC_L,    KC_R,     KC_C,   KC_D,
+//MIRROR, INSERTDXF, trim, project, ofset
+        MIRROR,    INSERTDXF,    KC_T,     KC_P,   KC_O,
+        NEWCOMPONENT,    KC_E,    KC_H,     KC_F,   CHAMFER,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS
     ),
@@ -57,8 +68,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [4] = LAYOUT(
                     KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
                                 TO(0),       TO(1),     TO(5),
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
+        KC_ESC,    KC_TRNS,    KC_SPACE,     KC_TRNS,   KC_ENTER,
+// route, route diff pair, move, mirror, rotate
+        KC_R,    C(KC_R),    KC_M,     MIRROR,   ROTATE,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS
@@ -70,9 +82,65 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
         KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS,
-        KC_TRNS,    KC_TRNS,    KC_TRNS,     KC_TRNS,   KC_TRNS
+        KC_TRNS,    KC_TRNS,    KC_TRNS,     MAGIC_SWAP_CTL_GUI,   MAGIC_UNSWAP_CTL_GUI
     ),
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+    case NEWSKETCH:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("ske");
+            tap_code(KC_ENTER);
+        }
+        break;
+    case MIRROR:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("MIRROR");
+            tap_code(KC_ENTER);
+        }
+        break;
+    case ROTATE:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("ROTATE");
+            tap_code(KC_ENTER);
+        }
+        break;
+    case INSERTDXF:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("DXF");
+            tap_code(KC_ENTER);
+        }
+        break;
+    case NEWCOMPONENT:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("New");
+            tap_code(KC_ENTER);
+        }
+        break;
+    case CHAMFER:
+        if (record->event.pressed) {
+            // when keycode QMKBEST is pressed
+            tap_code(KC_S);
+            SEND_STRING("Chamfer");
+            tap_code(KC_ENTER);
+        }
+        break;
+    }
+
+    return true;
+};
+
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
@@ -90,11 +158,18 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     } else if (index == 2) { /* Third encoder */
 // example of how to have encoder actions be layer dependent
         switch(biton32(layer_state)){
-            case 1:
+            case 2:
                 if (clockwise) {
-                tap_code(KC_UP);
+                tap_code16(S(G(KC_Z)));
                 } else {
-                tap_code(KC_DOWN);
+                tap_code16(G(KC_Z));
+                }
+                break;
+            case 4:
+                if (clockwise) {
+                tap_code16(S(G(KC_Z)));
+                } else {
+                tap_code16(G(KC_Z));
                 }
                 break;
             default:
