@@ -82,7 +82,8 @@ const is31_led g_is31_leds[DRIVER_LED_TOTAL] = {
     { 0, D_15, E_15, F_15 },
     { 0, D_2,  E_2,  F_2  },
     { 0, D_16, E_16, F_16 }
-}
+};
+
 #define XX NO_LED
 
 led_config_t g_led_config = {
