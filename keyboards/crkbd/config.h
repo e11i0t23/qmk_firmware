@@ -24,8 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define VENDOR_ID    0x4653
 #define PRODUCT_ID   0x0001
 #define DEVICE_VER   0x0001
-#define MANUFACTURER foostan
-#define PRODUCT      Corne
+#define MANUFACTURER Mechboards
+#define PRODUCT      Helidox R2G
 
 /* key matrix size */
 // Rows are doubled-up
@@ -74,3 +74,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define NO_ACTION_MACRO
 #define NO_ACTION_FUNCTION
+
+#define SPLIT_USB_DETECT
+
