@@ -156,3 +156,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCODER_RESOLUTION 2
 
 #define OLED_DISPLAY_128X64
+#define OLED_IC OLED_IC_SH1106
+#define OLED_COLUMN_OFFSET 2
