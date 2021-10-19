@@ -22,6 +22,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LT(1, KC_MUTE)
     )
 };
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+    case KC_1:
+      // Play a tone when enter is pressed
+      if (record->event.pressed) {
+
+      }
+      return true; // Let QMK send the enter press/release events
+    default:
+      return true; // Process all other keycodes normally
+  }
+}
+
 /**
 HSV_RED 0, 255, 255
 HSV_YELLOW 43, 255, 255
@@ -31,7 +45,8 @@ HSV_PURPLE 191, 255, 255
 **/
 void set_lighting(void) {
 
-        rgblight_sethsv_range(  0, 255,  75, 27,  3);
+        rgblight_sethsv_range(  27, 255,  75, 27,  30);
+        rgblight_sethsv_range(  27, 255,  75, 0,  3);
         rgblight_sethsv_range( 43, 255,  75,  3,  9);
         rgblight_sethsv_range( 85, 255,  75,  9, 15);
         rgblight_sethsv_range(170, 255,  75, 15, 21);
@@ -40,7 +55,8 @@ void set_lighting(void) {
         switch (encoder_mode/64)
         {
         case 0:
-            rgblight_sethsv_range(  0, 255, 255, 27,  3);
+            rgblight_sethsv_range(  27, 255, 255, 27,  30);
+            rgblight_sethsv_range(  27, 255, 255, 0,  3);
             break;
         case 1:
             rgblight_sethsv_range( 43, 255, 255,  3,  9);
@@ -50,6 +66,9 @@ void set_lighting(void) {
             break;
         case 3:
             rgblight_sethsv_range(170, 255, 255, 15, 21);
+            break;
+        case 4:
+            rgblight_sethsv_range(191, 255, 255, 21, 27);
             break;
         default:
             rgblight_sethsv_range(191, 255, 255, 21, 27);
@@ -62,6 +81,7 @@ void housekeeping_task_user(void){
     switch (biton32(layer_state))
     {
     case 1:
+        rgblight_set_effect_range(0, 0);
         break;
     default:
         rgblight_reload_from_eeprom();
