@@ -22,34 +22,51 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LT(1, KC_MUTE)
     )
 };
-
-int leds[9][9][2] = {
-    {{27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}},
-    {{3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}},
-    {{6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}},
-    {{9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}},
-    {{12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}},
-    {{15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}},
-    {{18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}},
-    {{21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}},
-    {{24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}},
-    };
-
+/**
+HSV_RED 0, 255, 255
+HSV_YELLOW 43, 255, 255
+HSV_GREEN 85, 255, 255
+HSV_BLUE 170, 255, 255
+HSV_PURPLE 191, 255, 255
+**/
 void set_lighting(void) {
 
-        rgblight_sethsv_range(HSV_PURPLE, leds[encoder_mode/32][0][0], leds[encoder_mode/32][0][1]);
-        rgblight_sethsv_range(HSV_RED, leds[encoder_mode/32][1][0], leds[encoder_mode/32][1][1]);
-        rgblight_sethsv_range(HSV_YELLOW, leds[encoder_mode/32][2][0], leds[encoder_mode/32][2][1]);
-        rgblight_sethsv_range(HSV_PINK, leds[encoder_mode/32][3][0], leds[encoder_mode/32][3][1]);
-        rgblight_sethsv_range(HSV_GREEN, leds[encoder_mode/32][4][0], leds[encoder_mode/32][4][1]);
-        rgblight_sethsv_range(HSV_BLUE, leds[encoder_mode/32][5][0], leds[encoder_mode/32][5][1]);
-        rgblight_sethsv_range(HSV_ORANGE, leds[encoder_mode/32][6][0], leds[encoder_mode/32][6][1]);
-        rgblight_sethsv_range(HSV_CYAN, leds[encoder_mode/32][7][0], leds[encoder_mode/32][7][1]);
-        rgblight_sethsv_range(HSV_MAGENTA, leds[encoder_mode/32][8][0], leds[encoder_mode/32][8][1]);
+        rgblight_sethsv_range(  0, 255,  75, 27,  3);
+        rgblight_sethsv_range( 43, 255,  75,  3,  9);
+        rgblight_sethsv_range( 85, 255,  75,  9, 15);
+        rgblight_sethsv_range(170, 255,  75, 15, 21);
+        rgblight_sethsv_range(191, 255,  75, 21, 27);
+
+        switch (encoder_mode/64)
+        {
+        case 0:
+            rgblight_sethsv_range(  0, 255, 255, 27,  3);
+            break;
+        case 1:
+            rgblight_sethsv_range( 43, 255, 255,  3,  9);
+            break;
+        case 2:
+            rgblight_sethsv_range( 85, 255, 255,  9, 15);
+            break;
+        case 3:
+            rgblight_sethsv_range(170, 255, 255, 15, 21);
+            break;
+        default:
+            rgblight_sethsv_range(191, 255, 255, 21, 27);
+            break;
+        }
+
 }
 
-void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-    set_lighting();
+void housekeeping_task_user(void){
+    switch (biton32(layer_state))
+    {
+    case 1:
+        break;
+    default:
+        rgblight_reload_from_eeprom();
+        break;
+    }
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
@@ -58,66 +75,39 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         {
         case 1:
                 if (clockwise) {
-                    encoder_mode += 32;
+                    encoder_mode += 64;
                 } else {
-                    encoder_mode += -32;
+                    encoder_mode += -64;
                 }
                 set_lighting();
             break;
 
         default:
+            rgblight_reload_from_eeprom();
             switch(encoder_mode)
             {
-            case 7*32:
+            case 3*64:
                 if (clockwise) {
-                    tap_code(KC_VOLU);
+                    rgblight_step();
                 } else {
-                    tap_code(KC_VOLD);
+                    rgblight_step_reverse();
                 }
                 break;
-            case 6*32:
-                if (clockwise) {
-                    tap_code(KC_VOLU);
-                } else {
-                    tap_code(KC_VOLD);
-                }
-                break;
-            case 5*32:
-                if (clockwise) {
-                    tap_code(KC_VOLU);
-                } else {
-                    tap_code(KC_VOLD);
-                }
-                break;
-            case 4*32:
-                if (clockwise) {
-                    tap_code(KC_VOLU);
-                } else {
-                    tap_code(KC_VOLD);
-                }
-                break;
-            case 3*32:
-                if (clockwise) {
-                    tap_code(KC_VOLU);
-                } else {
-                    tap_code(KC_VOLD);
-                }
-                break;
-            case 2*32:
+            case 2*64:
                 if (clockwise) {
                     tap_code(KC_RIGHT);
                 } else {
                     tap_code(KC_LEFT);
                 }
                 break;
-            case 1*32:
+            case 1*64:
                 if (clockwise) {
                     tap_code(KC_PGDN);
                 } else {
                     tap_code(KC_PGUP);
                 }
                 break;
-            case 0*32:
+            case 0*64:
                 if (clockwise) {
                     tap_code(KC_DOWN);
                 } else {
