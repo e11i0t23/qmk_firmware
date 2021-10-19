@@ -23,25 +23,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
+int leds[9][9][2] = {
+    {{27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}},
+    {{3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}},
+    {{6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}},
+    {{9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}},
+    {{12, 15}, {15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}},
+    {{15, 18}, {18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}},
+    {{18, 21}, {21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}},
+    {{21, 24}, {24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}},
+    {{24, 27}, {27, 3}, {3, 6}, {6, 9}, {9, 12}, {12, 15}, {15, 18}, {18, 21}, {21, 24}},
+    };
+
 void set_lighting(void) {
-        switch(encoder_mode)
-            {
-            case 3*64:
-                rgblight_sethsv(HSV_CYAN);
-                break;
-            case 1*64:
-                rgblight_sethsv(HSV_GREEN);
-                break;
-            case 2*64:
-                rgblight_sethsv(HSV_RED);
-                break;
-            case 0*64:
-                rgblight_sethsv(HSV_ORANGE);
-                break;
-            default:
-                rgblight_sethsv(HSV_PURPLE);
-                break;
-            }
+
+        rgblight_sethsv_range(HSV_PURPLE, leds[encoder_mode/32][0][0], leds[encoder_mode/32][0][1]);
+        rgblight_sethsv_range(HSV_RED, leds[encoder_mode/32][1][0], leds[encoder_mode/32][1][1]);
+        rgblight_sethsv_range(HSV_YELLOW, leds[encoder_mode/32][2][0], leds[encoder_mode/32][2][1]);
+        rgblight_sethsv_range(HSV_PINK, leds[encoder_mode/32][3][0], leds[encoder_mode/32][3][1]);
+        rgblight_sethsv_range(HSV_GREEN, leds[encoder_mode/32][4][0], leds[encoder_mode/32][4][1]);
+        rgblight_sethsv_range(HSV_BLUE, leds[encoder_mode/32][5][0], leds[encoder_mode/32][5][1]);
+        rgblight_sethsv_range(HSV_ORANGE, leds[encoder_mode/32][6][0], leds[encoder_mode/32][6][1]);
+        rgblight_sethsv_range(HSV_CYAN, leds[encoder_mode/32][7][0], leds[encoder_mode/32][7][1]);
+        rgblight_sethsv_range(HSV_MAGENTA, leds[encoder_mode/32][8][0], leds[encoder_mode/32][8][1]);
 }
 
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -54,9 +58,9 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         {
         case 1:
                 if (clockwise) {
-                    encoder_mode += 64;
+                    encoder_mode += 32;
                 } else {
-                    encoder_mode += -64;
+                    encoder_mode += -32;
                 }
                 set_lighting();
             break;
@@ -64,28 +68,56 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         default:
             switch(encoder_mode)
             {
-            case 3*64:
+            case 7*32:
                 if (clockwise) {
                     tap_code(KC_VOLU);
                 } else {
                     tap_code(KC_VOLD);
                 }
                 break;
-            case 1*64:
+            case 6*32:
+                if (clockwise) {
+                    tap_code(KC_VOLU);
+                } else {
+                    tap_code(KC_VOLD);
+                }
+                break;
+            case 5*32:
+                if (clockwise) {
+                    tap_code(KC_VOLU);
+                } else {
+                    tap_code(KC_VOLD);
+                }
+                break;
+            case 4*32:
+                if (clockwise) {
+                    tap_code(KC_VOLU);
+                } else {
+                    tap_code(KC_VOLD);
+                }
+                break;
+            case 3*32:
+                if (clockwise) {
+                    tap_code(KC_VOLU);
+                } else {
+                    tap_code(KC_VOLD);
+                }
+                break;
+            case 2*32:
                 if (clockwise) {
                     tap_code(KC_RIGHT);
                 } else {
                     tap_code(KC_LEFT);
                 }
                 break;
-            case 2*64:
+            case 1*32:
                 if (clockwise) {
                     tap_code(KC_PGDN);
                 } else {
                     tap_code(KC_PGUP);
                 }
                 break;
-            case 0*64:
+            case 0*32:
                 if (clockwise) {
                     tap_code(KC_DOWN);
                 } else {
