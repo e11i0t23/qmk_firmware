@@ -28,9 +28,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case KC_1:
       // Play a tone when enter is pressed
       if (record->event.pressed) {
-
+          //CUstom code instead of sending one
       }
-      return true; // Let QMK send the enter press/release events
+      return false; // Let QMK send the enter press/release events
     default:
       return true; // Process all other keycodes normally
   }
@@ -42,36 +42,41 @@ HSV_YELLOW 43, 255, 255
 HSV_GREEN 85, 255, 255
 HSV_BLUE 170, 255, 255
 HSV_PURPLE 191, 255, 255
+HSV_GOLDENROD 30, 218, 218
 **/
+
+bool setlights = false;
+
 void set_lighting(void) {
+        setlights = true;
+        rgblight_sethsv_range(  5, 255,  45,  0,   5);
+        rgblight_sethsv_range( 43, 255,  45,  5,  10);
+        rgblight_sethsv_range( 85, 255,  45, 10,  15);
+        rgblight_sethsv_range(130, 255,  45, 15,  20);
+        rgblight_sethsv_range(234, 255,  45, 20,  25);
+        rgblight_sethsv_range(  0,   0,  45, 25,  30);
 
-        rgblight_sethsv_range(  27, 255,  75, 27,  30);
-        rgblight_sethsv_range(  27, 255,  75, 0,  3);
-        rgblight_sethsv_range( 43, 255,  75,  3,  9);
-        rgblight_sethsv_range( 85, 255,  75,  9, 15);
-        rgblight_sethsv_range(170, 255,  75, 15, 21);
-        rgblight_sethsv_range(191, 255,  75, 21, 27);
-
-        switch (encoder_mode/64)
+        switch (encoder_mode)
         {
-        case 0:
-            rgblight_sethsv_range(  27, 255, 255, 27,  30);
-            rgblight_sethsv_range(  27, 255, 255, 0,  3);
-            break;
         case 1:
-            rgblight_sethsv_range( 43, 255, 255,  3,  9);
+            rgblight_sethsv_range(  5, 255, 255,  0,  5);
             break;
         case 2:
-            rgblight_sethsv_range( 85, 255, 255,  9, 15);
+            rgblight_sethsv_range( 43, 255, 255,  5, 10);
             break;
         case 3:
-            rgblight_sethsv_range(170, 255, 255, 15, 21);
+            rgblight_sethsv_range( 85, 255, 255, 10, 15);
             break;
         case 4:
-            rgblight_sethsv_range(191, 255, 255, 21, 27);
+            rgblight_sethsv_range(130, 255, 255, 15, 20);
+            break;
+        case 5:
+            rgblight_sethsv_range(234, 255, 255, 20, 25);
+            break;
+        case 6:
+            rgblight_sethsv_range(  0,   0, 255, 25, 30);
             break;
         default:
-            rgblight_sethsv_range(191, 255, 255, 21, 27);
             break;
         }
 
@@ -81,10 +86,13 @@ void housekeeping_task_user(void){
     switch (biton32(layer_state))
     {
     case 1:
-        rgblight_set_effect_range(0, 0);
         break;
     default:
-        rgblight_reload_from_eeprom();
+        if (setlights){
+            setlights = false;
+            rgblight_set_effect_range(0, 30);
+            rgblight_reload_from_eeprom();
+        }
         break;
     }
 }
@@ -95,39 +103,59 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         {
         case 1:
                 if (clockwise) {
-                    encoder_mode += 64;
+                    encoder_mode += 1;
+                    if (encoder_mode == 7) {
+                        encoder_mode = 1;
+                    }
                 } else {
-                    encoder_mode += -64;
+                    encoder_mode += -1;
+                    if (encoder_mode == 0) {
+                        encoder_mode = 6;
+                    }
                 }
+                rgblight_set_effect_range(0, 0);
                 set_lighting();
             break;
 
         default:
-            rgblight_reload_from_eeprom();
             switch(encoder_mode)
             {
-            case 3*64:
+            case 6:
                 if (clockwise) {
                     rgblight_step();
                 } else {
                     rgblight_step_reverse();
                 }
                 break;
-            case 2*64:
+            case 5:
+                if (clockwise) {
+                    tap_code(KC_AGAIN);
+                } else {
+                    tap_code(KC_UNDO);
+                }
+                break;
+            case 4:
+                if (clockwise) {
+                    rgblight_step();
+                } else {
+                    rgblight_step_reverse();
+                }
+                break;
+            case 3:
+                if (clockwise) {
+                    tap_code(KC_PGUP);
+                } else {
+                    tap_code(KC_PGDN);
+                }
+                break;
+            case 2:
                 if (clockwise) {
                     tap_code(KC_RIGHT);
                 } else {
                     tap_code(KC_LEFT);
                 }
                 break;
-            case 1*64:
-                if (clockwise) {
-                    tap_code(KC_PGDN);
-                } else {
-                    tap_code(KC_PGUP);
-                }
-                break;
-            case 0*64:
+            case 1:
                 if (clockwise) {
                     tap_code(KC_DOWN);
                 } else {
@@ -135,11 +163,6 @@ void encoder_update_user(uint8_t index, bool clockwise) {
                 }
                 break;
             default:
-                if (clockwise){
-                    tap_code(KC_VOLU);
-                } else{
-                    tap_code(KC_VOLD);
-                }
                 break;
             }
             break;
