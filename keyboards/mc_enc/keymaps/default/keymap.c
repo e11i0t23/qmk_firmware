@@ -19,7 +19,7 @@ uint8_t encoder_mode = 0;
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [0] = LAYOUT(
-        LT(1, KC_MUTE)
+        LT(1, KC_1)
     )
 };
 
@@ -28,7 +28,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case KC_1:
       // Play a tone when enter is pressed
       if (record->event.pressed) {
-          //CUstom code instead of sending one
+        switch (encoder_mode)
+        {
+        case 1:
+            //mute
+            tap_code(KC_MUTE);
+            break;
+        case 2:
+            //
+            break;
+        case 3:
+            //
+            break;
+        case 4:
+            // Sleep
+            tap_code(KC_SLEP);
+            break;
+        case 5:
+            // PASTE
+            tap_code(KC_PSTE);
+            break;
+        case 6:
+            // RGB TOG
+            tap_code16(RGB_TOG);
+            break;
+        default:
+            break;
+        }
       }
       return false; // Let QMK send the enter press/release events
     default:
@@ -120,46 +146,52 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         default:
             switch(encoder_mode)
             {
-            case 6:
+            case 1:
+                // VOLUME
                 if (clockwise) {
-                    rgblight_step();
+                    tap_code(KC_VOLU);
                 } else {
-                    rgblight_step_reverse();
-                }
-                break;
-            case 5:
-                if (clockwise) {
-                    tap_code(KC_AGAIN);
-                } else {
-                    tap_code(KC_UNDO);
-                }
-                break;
-            case 4:
-                if (clockwise) {
-                    rgblight_step();
-                } else {
-                    rgblight_step_reverse();
-                }
-                break;
-            case 3:
-                if (clockwise) {
-                    tap_code(KC_PGUP);
-                } else {
-                    tap_code(KC_PGDN);
+                    tap_code(KC_VOLD);
                 }
                 break;
             case 2:
+                // UP/DOWN
+                if (clockwise) {
+                    tap_code(KC_DOWN);
+                } else {
+                    tap_code(KC_UP);
+                }
+                break;
+            case 3:
+                //LEFT/RIGHT
                 if (clockwise) {
                     tap_code(KC_RIGHT);
                 } else {
                     tap_code(KC_LEFT);
                 }
                 break;
-            case 1:
+            case 4:
+                // Brightness
                 if (clockwise) {
-                    tap_code(KC_DOWN);
+                    tap_code(KC_BRIU);
                 } else {
-                    tap_code(KC_UP);
+                    tap_code(KC_BRID);
+                }
+                break;
+            case 5:
+                // UNDO REDO
+                if (clockwise) {
+                    tap_code(KC_AGAIN);
+                } else {
+                    tap_code(KC_UNDO);
+                }
+                break;
+            case 6:
+                // RGB MODE
+                if (clockwise) {
+                    rgblight_step();
+                } else {
+                    rgblight_step_reverse();
                 }
                 break;
             default:
