@@ -36,9 +36,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case 2:
             //
+            tap_code(KC_HOME);
             break;
         case 3:
             //
+            tap_code(KC_SPACE);
             break;
         case 4:
             // Sleep
@@ -157,9 +159,9 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             case 2:
                 // UP/DOWN
                 if (clockwise) {
-                    tap_code(KC_DOWN);
-                } else {
                     tap_code(KC_UP);
+                } else {
+                    tap_code(KC_DOWN);
                 }
                 break;
             case 3:
