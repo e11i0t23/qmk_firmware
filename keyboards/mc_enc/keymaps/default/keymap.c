@@ -20,45 +20,50 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
     [0] = LAYOUT(
         LT(1, KC_1)
+    ),
+    [1] = LAYOUT(
+        KC_TRNS
     )
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    case KC_1:
+    case LT(1, KC_1):
       // Play a tone when enter is pressed
-      if (record->event.pressed) {
-        switch (encoder_mode)
-        {
-        case 1:
-            //mute
-            tap_code(KC_MUTE);
-            break;
-        case 2:
-            //
-            tap_code(KC_HOME);
-            break;
-        case 3:
-            //
-            tap_code(KC_SPACE);
-            break;
-        case 4:
-            // Sleep
-            tap_code(KC_SLEP);
-            break;
-        case 5:
-            // PASTE
-            tap_code(KC_PSTE);
-            break;
-        case 6:
-            // RGB TOG
-            tap_code16(RGB_TOG);
-            break;
-        default:
-            break;
+        if (record->tap.count && record->event.pressed) {
+            switch (encoder_mode) {
+            case 1:
+                //mute
+                tap_code(KC_MUTE);
+                break;
+            case 2:
+                //
+                tap_code(KC_HOME);
+                break;
+            case 3:
+                //
+                tap_code(KC_SPACE);
+                break;
+            case 4:
+                // Sleep
+                tap_code(KC_SLEP);
+                break;
+            case 5:
+                // PASTE
+                tap_code(KC_PSTE);
+                break;
+            case 6:
+                // RGB TOG
+                tap_code16(RGB_TOG);
+                break;
+            default:
+                break;
+            }
+
+            return false; // Let QMK send the enter press/release events
+        }else{
+            return true;
         }
-      }
-      return false; // Let QMK send the enter press/release events
     default:
       return true; // Process all other keycodes normally
   }
@@ -125,7 +130,7 @@ void housekeeping_task_user(void){
     }
 }
 
-void encoder_update_user(uint8_t index, bool clockwise) {
+bool encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) { /* First encoder */
         switch (biton32(layer_state))
         {
@@ -202,4 +207,5 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             break;
         }
     }
+    return false;
 }
