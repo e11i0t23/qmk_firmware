@@ -17,60 +17,49 @@
 #include "print.h"
 #include "mc_enc.h"
 #include "raw_hid.h"
+#include "tmk_core/common/eeprom.h"
 
 //structure for HID change messages
 /*
- * Update Command structure no response needed:
- * 0 Command Code:              0x4550
- * 1 Encoder Mode:              0x00 to 0x05
- * 2 Key:                       clockwise 0x00
- *                              anticlockwise 0x01
- *                              button 0x02
- * 4 Keycode:                   Keycode
- *
- * Fetch Current Keymap:
- * 0 Command Code:              0x4551
- * 1 Encoder Mode:              0x00 to 0x05
- *
- * Respond with:
- * 0 Command Code:              0x4551
- * 1 Clockwise Keycode:         Keycode
- * 2 Anti-Clockwise Keycode:    Keycode
- * 3 Button Keycode:            Keycode
- *
- * Bi-Directional Layer Mirroring Commands:
- * 0 Command Code:              0x4552
- * 1 Encoder Mode:              0x00 to 0x05
- */
+* 0 prject code 0x45
+* 1 Encoder Mode Code between 0x01 and 0x06
+* 2 Key:
+*      clockwise 0x00
+*      anticlockwise 0x01
+*      button 0x02
+* 4 Keycode
+*/
+//typedef uint8_t BYTE;
+// typedef union {
+//   BYTE raw[64];
+//   struct {
+//     bool configd;
+//     uint16_t actions[6][3];
+//   };
+// } encoder_actions_t;
 
-typedef union {
-  uint32_t raw;
-  struct {
-    bool configd;
-    uint16_t actions[6][3];
-  };
-} encoder_actions_t;
-
-encoder_actions_t encoder_actions;
-uint16_t default_actions[6][3] = {{0x0080, 0x0081, 0x007F},{0x0052, 0x0051, 0x004A},{0x004F, 0x004E, 0x002C},{0x007A, 0x0079, 0x007D},{0x00BD, 0x00BE, 0x00A6},{0x5CC4, 0x5CC5, 0x5CC3}};
+// encoder_actions_t encoder_actions;
+uint16_t EEPROM_ADDR = 0x32;
+uint16_t eepromAdressOfsets[6][3] = {{0x01,0x03,0x05},{0x07,0x09, 0x0B},{0x0D, 0x0F, 0x11},{0x13,0x15, 0x17},{0x19,0x1B, 0x1D},{0x1F, 0x21, 0x23}};
+uint16_t default_actions[6][3] = {{0x0080, 0x0081, 0x007F},{0x0052, 0x0051, 0x004A},{0x004F, 0x004E, 0x002C},{0x007A, 0x0079, 0x007D},{0x0048, 0x0047, 0x00A6},{0x5CC4, 0x5CC5, 0x5CC3}};
 uint16_t encoder_mode = 0;
 bool setlights = false;
 
-void eeconfig_init_kb(void) {
-    encoder_actions.configd = true;
+void eeprom_enc_init(void) {
+    // encoder_actions.configd = true;
+    eeprom_write_byte((uint8_t *)EEPROM_ADDR, 0x01);
     for (int8_t x = 0; x < 6; x++){
        for (int8_t y = 0; y < 3; y++){
-           encoder_actions.actions[x][y] = default_actions[x][y];
+           eeprom_write_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[x][y]), default_actions[x][y]);
         }
     }
-    eeconfig_update_kb(encoder_actions.raw);
-    eeconfig_init_user();
+    //eeconfig_update_kb(encoder_actions.raw);
 }
 void matrix_init_kb(void){
-
-    encoder_actions.raw = eeconfig_read_kb();
-    if (!encoder_actions.configd){
-        eeconfig_init_kb();
+    uprintf("Check:    0x%04X\n", eeprom_read_byte((uint8_t *)(EEPROM_ADDR)));
+    if (eeprom_read_byte((uint8_t *)(EEPROM_ADDR)) != 0x01){
+        printf("1");
+        eeprom_enc_init();
     }
 
     return matrix_init_user();
@@ -90,12 +79,12 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     if (check == 0x4551){
         data[0] = check>>8;
         data[1] = check;
-        data[2] = encoder_actions.actions[active_mode][0]>>8;
-        data[3] = encoder_actions.actions[active_mode][0];
-        data[4] = encoder_actions.actions[active_mode][1]>>8;
-        data[5] = encoder_actions.actions[active_mode][1];
-        data[6] = encoder_actions.actions[active_mode][2]>>8;
-        data[7] = encoder_actions.actions[active_mode][2];
+        data[2] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][0]))>>8;
+        data[3] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][0]));
+        data[4] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][1]))>>8;
+        data[5] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][1]));
+        data[6] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][2]))>>8;
+        data[7] = eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][2]));
         raw_hid_send(data, length);
         encoder_mode = active_mode;
         return;
@@ -114,9 +103,10 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     if (check != 0x4550) return;
     uprintf("Key:      0x%04X\n", key);
     uprintf("Keycode:  0x%04X\n", newKeycode);
-    encoder_actions.actions[active_mode][key] = newKeycode;
-    eeconfig_update_kb(encoder_actions.raw);
-    uprintf("4 0x%04X\n", encoder_actions.actions[active_mode][key]);
+    eeprom_update_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[active_mode][key]), newKeycode);
+    // encoder_actions.actions[active_mode][key] = newKeycode;
+    // eeconfig_update_kb(encoder_actions.raw);
+    //uprintf("4 0x%04X\n", encoder_actions.actions[active_mode][key]);
 
 
     raw_hid_send(data, length);
@@ -183,7 +173,9 @@ void housekeeping_task_kb(void){
     case 1:
         break;
     default:
+        uprint("test")
         if (setlights){
+            uprint("test2")
             setlights = false;
             rgblight_set_effect_range(0, 30);
             rgblight_reload_from_eeprom();
@@ -194,7 +186,7 @@ void housekeeping_task_kb(void){
 
 
 bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (index == 0) { /* First encoder */
+    if (index == 2) { /* First encoder */
         switch (biton32(layer_state))
         {
         case 1:
@@ -214,16 +206,18 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
             data[3] = encoder_mode;
             uint8_t length = 32;
             raw_hid_send(data, length);
+            if (rgblight_is_enabled()){
+                rgblight_set_effect_range(0, 0);
+                set_lighting();
+            }
 
-            rgblight_set_effect_range(0, 0);
-            set_lighting();
             break;
 
         default:
             if (clockwise) {
-                handle_keycode(encoder_actions.actions[encoder_mode][0]);
+                handle_keycode(eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[encoder_mode][0])));
             } else {
-                handle_keycode(encoder_actions.actions[encoder_mode][1]);
+                handle_keycode(eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[encoder_mode][1])));
             }
             break;
         }
@@ -237,7 +231,7 @@ bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
     {
     case LT(1, KC_X):
         if (record->tap.count && record->event.pressed) {
-            handle_keycode(encoder_actions.actions[encoder_mode][2]);
+            handle_keycode(eeprom_read_word((uint16_t *)(EEPROM_ADDR+eepromAdressOfsets[encoder_mode][2])));
             return false; // Let QMK send the enter press/release events
         }else{
             return true;
