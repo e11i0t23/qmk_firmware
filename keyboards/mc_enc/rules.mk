@@ -23,3 +23,4 @@ AUDIO_ENABLE = no           # Audio output
 ENCODER_ENABLE = yes
 RGBLIGHT_ENABLE = yes
 TAP_DANCE_ENABLE = no
+RAW_ENABLE = yes

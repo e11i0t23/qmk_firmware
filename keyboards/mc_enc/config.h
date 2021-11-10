@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config_common.h"
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID    0xDECE
-#define PRODUCT_ID   0x001F
+#define VENDOR_ID    0x4550
+#define PRODUCT_ID   0x0232
 #define DEVICE_VER   0x0001
 #define MANUFACTURER Elliot Powell
-#define PRODUCT      MacroPad
+#define PRODUCT      RGBKnob
 
 /* key matrix size */
 #define MATRIX_ROWS 1
