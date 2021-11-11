@@ -39,7 +39,7 @@
 // } encoder_actions_t;
 
 // encoder_actions_t encoder_actions;
-uint16_t EEPROM_ADDR = 0x32;
+uint16_t EEPROM_ADDR = 512;
 uint16_t eepromAdressOfsets[6][3] = {{0x01,0x03,0x05},{0x07,0x09, 0x0B},{0x0D, 0x0F, 0x11},{0x13,0x15, 0x17},{0x19,0x1B, 0x1D},{0x1F, 0x21, 0x23}};
 uint16_t default_actions[6][3] = {{0x0080, 0x0081, 0x007F},{0x0052, 0x0051, 0x004A},{0x004F, 0x004E, 0x002C},{0x007A, 0x0079, 0x007D},{0x0048, 0x0047, 0x00A6},{0x5CC4, 0x5CC5, 0x5CC3}};
 uint16_t encoder_mode = 0;
@@ -99,6 +99,19 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
         return;
     }
 
+    if (check == 0x4553 ) {
+        if (active_mode != 0x0000){
+            rgblight_mode(active_mode);
+        }else{
+            data[0] = check>>8;
+            data[1] = check;
+            data[2] = ((uint16_t)rgblight_get_mode()>>8);
+            data[3] = (uint16_t)rgblight_get_mode();
+            raw_hid_send(data, length);
+        }
+        return;
+    }
+
 
     if (check != 0x4550) return;
     uprintf("Key:      0x%04X\n", key);
@@ -112,6 +125,17 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     raw_hid_send(data, length);
 }
 
+// void sendRGBMode(){
+//     // uint8_t data[8];
+//     // data[0] = 0x4552>>8;
+//     // data[1] = ((uint8_t)0x4552);
+//     // data[2] = encoder_mode>>8;
+//     // data[3] = encoder_mode;
+//     // uint8_t length = 32;
+//     // raw_hid_send(data, length);
+
+// }
+
 void handle_keycode(uint16_t keycode){
 
     switch (keycode)
@@ -120,10 +144,16 @@ void handle_keycode(uint16_t keycode){
         rgblight_toggle();
         break;
     case 0x5CC4:
-        rgblight_step();
+        if (rgblight_is_enabled()){
+            rgblight_step();
+            uprintf("RGBMODE:    0x%04X\n", rgblight_get_mode());
+        }
         break;
     case 0x5CC5:
-        rgblight_step_reverse();
+        if (rgblight_is_enabled()){
+            rgblight_step_reverse();
+            uprintf("RGBMODE:    0x%04X\n", rgblight_get_mode());
+        }
         break;
     default:
         tap_code16(keycode);
@@ -173,12 +203,12 @@ void housekeeping_task_kb(void){
     case 1:
         break;
     default:
-        uprint("test")
         if (setlights){
-            uprint("test2")
             setlights = false;
             rgblight_set_effect_range(0, 30);
             rgblight_reload_from_eeprom();
+            uprintf("RGBMODE:    0x%04X\n", rgblight_get_mode());
+
         }
         break;
     }
@@ -186,7 +216,7 @@ void housekeeping_task_kb(void){
 
 
 bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (index == 2) { /* First encoder */
+    if (index == 0) { /* First encoder */
         switch (biton32(layer_state))
         {
         case 1:
