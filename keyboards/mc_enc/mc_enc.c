@@ -17,7 +17,7 @@
 #include "print.h"
 #include "mc_enc.h"
 #include "raw_hid.h"
-#include "tmk_core/common/eeprom.h"
+#include "eeprom.h"
 
 //structure for HID change messages
 /*
@@ -236,10 +236,11 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
             data[3] = encoder_mode;
             uint8_t length = 32;
             raw_hid_send(data, length);
-            if (rgblight_is_enabled()){
-                rgblight_set_effect_range(0, 0);
-                set_lighting();
-            }
+#ifdef RGBLIGHT_ENABLE
+            rgblight_enable_noeeprom();
+            rgblight_set_effect_range(0, 0);
+            set_lighting();
+#endif
 
             break;
 
