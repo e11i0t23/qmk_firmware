@@ -59,6 +59,9 @@
 /*== all animations enable ==*/
 //#    define RGBLIGHT_ANIMATIONS
 /*== or choose animations ==*/
+#    define RGBLIGHT_DEFAULT_HUE 185
+#    define RGBLIGHT_DEFAULT_SAT 255
+#    define RGBLIGHT_DEFAULT_VAL 125
 #    define RGBLIGHT_EFFECT_BREATHING
 #    define RGBLIGHT_EFFECT_RAINBOW_MOOD
 #    define RGBLIGHT_EFFECT_RAINBOW_SWIRL
