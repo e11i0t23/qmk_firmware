@@ -100,14 +100,14 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
     }
 
     if (check == 0x4553 ) {
-        if (active_mode != 0x0000){
-            rgblight_mode(active_mode);
-        }else{
+        if (active_mode == 0xFFFF){
             data[0] = check>>8;
             data[1] = check;
             data[2] = ((uint16_t)rgblight_get_mode()>>8);
             data[3] = (uint16_t)rgblight_get_mode();
             raw_hid_send(data, length);
+        }else{
+            rgblight_mode(active_mode);
         }
         return;
     }
@@ -138,23 +138,79 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 
 void handle_keycode(uint16_t keycode){
 
+
     switch (keycode)
     {
-    case 0x5CC3:
+    case 0x5CC3:    //RGB_TOG
         rgblight_toggle();
         break;
-    case 0x5CC4:
+    case 0x5CC4:    //RGB_MODE_FORWARD
         if (rgblight_is_enabled()){
             rgblight_step();
             uprintf("RGBMODE:    0x%04X\n", rgblight_get_mode());
+            uint8_t data[8];
+            data[0] = 0x4553>>8;
+            data[1] = ((uint8_t)0x4553);;
+            data[2] = ((uint16_t)rgblight_get_mode()>>8);
+            data[3] = (uint16_t)rgblight_get_mode();
+            uint8_t length = 32;
+            raw_hid_send(data, length);
         }
         break;
-    case 0x5CC5:
+    case 0x5CC5:    //RGB_MODE_REVERSE
         if (rgblight_is_enabled()){
             rgblight_step_reverse();
             uprintf("RGBMODE:    0x%04X\n", rgblight_get_mode());
+                        uint8_t data[8];
+            data[0] = 0x4553>>8;
+            data[1] = ((uint8_t)0x4553);;
+            data[2] = ((uint16_t)rgblight_get_mode()>>8);
+            data[3] = (uint16_t)rgblight_get_mode();
+            uint8_t length = 32;
+            raw_hid_send(data, length);
         }
         break;
+    case 0x5CC6:    //RGB_HUI
+        if (rgblight_is_enabled()){
+            rgblight_increase_hue();
+        }
+        break;
+    case 0x5CC7:    //RGB_HUD
+        if (rgblight_is_enabled()){
+            rgblight_decrease_hue();
+        }
+        break;
+    case 0x5CC8:    //RGB_SAI
+        if (rgblight_is_enabled()){
+            rgblight_increase_sat();
+        }
+        break;
+    case 0x5CC9:    //RGB_SAD
+        if (rgblight_is_enabled()){
+            rgblight_decrease_sat();
+        }
+        break;
+    case 0x5CCA:    //RGB_VAI
+        if (rgblight_is_enabled()){
+            rgblight_increase_val();
+        }
+        break;
+    case 0x5CCB:    //RGB_VAD
+        if (rgblight_is_enabled()){
+            rgblight_decrease_val();
+        }
+        break;
+    case 0x5CCC:    //RGB_SPI
+        if (rgblight_is_enabled()){
+            rgblight_increase_speed();
+        }
+        break;
+    case 0x5CCD:    //RGB_SPD
+        if (rgblight_is_enabled()){
+            rgblight_decrease_speed();
+        }
+        break;
+
     default:
         tap_code16(keycode);
         break;
@@ -162,14 +218,15 @@ void handle_keycode(uint16_t keycode){
 
 }
 
+// Handles showing encoder mode lighting while in change mode
 void set_lighting(void) {
         setlights = true;
-        rgblight_sethsv_range(  5, 255,  45,  0,   5);
-        rgblight_sethsv_range( 43, 255,  45,  5,  10);
-        rgblight_sethsv_range( 85, 255,  45, 10,  15);
-        rgblight_sethsv_range(130, 255,  45, 15,  20);
-        rgblight_sethsv_range(234, 255,  45, 20,  25);
-        rgblight_sethsv_range(  0,   0,  45, 25,  30);
+        rgblight_sethsv_range(  5, 255,  35,  0,   5);
+        rgblight_sethsv_range( 43, 255,  35,  5,  10);
+        rgblight_sethsv_range( 85, 255,  35, 10,  15);
+        rgblight_sethsv_range(130, 255,  35, 15,  20);
+        rgblight_sethsv_range(234, 255,  35, 20,  25);
+        rgblight_sethsv_range(  0,   0,  35, 25,  30);
 
         switch (encoder_mode)
         {
@@ -203,7 +260,9 @@ void housekeeping_task_kb(void){
     case 1:
         break;
     default:
+    // reloads lights after layer change
         if (setlights){
+            uprint("inSetLights\n");
             setlights = false;
             rgblight_set_effect_range(0, 30);
             rgblight_reload_from_eeprom();
@@ -220,6 +279,7 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
         switch (biton32(layer_state))
         {
         case 1:
+            // cylce encoder mode
             if (clockwise) {
                 if (encoder_mode == 5) {
                     encoder_mode = 0;
@@ -229,6 +289,7 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
                     encoder_mode = 5;
                 } else encoder_mode -= 1;
             }
+            // send encoder mode to pc
             uint8_t data[8];
             data[0] = 0x4552>>8;
             data[1] = ((uint8_t)0x4552);
@@ -236,11 +297,12 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
             data[3] = encoder_mode;
             uint8_t length = 32;
             raw_hid_send(data, length);
-#ifdef RGBLIGHT_ENABLE
-            rgblight_enable_noeeprom();
-            rgblight_set_effect_range(0, 0);
-            set_lighting();
-#endif
+
+            // update rgb to show enabled mode
+            if (rgblight_is_enabled()){
+                rgblight_set_effect_range(0, 0);
+                set_lighting();
+            }
 
             break;
 
