@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PRODUCT         arisu
 
 /* key matrix size */
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 15
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 14
 
 /*
  * Keyboard Matrix Assignments
@@ -40,8 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
  *
 */
-#define MATRIX_ROW_PINS { D0, D1, D2, D3, D5 }
-#define MATRIX_COL_PINS { F0, F1, E6, C7, C6, B6, D4, B1, B0, B7, B5, B4, D7, D6, B3 }
+#define MATRIX_ROW_PINS { F4, B2, B3, D2, D3, D5 }
+#define MATRIX_COL_PINS { F0, F1, E6, C7, C6, B6, D4, B1, B0, B7, B5, B4, D7, D6 }
 #define UNUSED_PINS
 
 /* COL2ROW, ROW2COL*/
@@ -129,3 +129,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_ONESHOT
 //#define NO_ACTION_MACRO
 //#define NO_ACTION_FUNCTION
+
+#define ENCODERS_PAD_A { F6 }
+#define ENCODERS_PAD_B { F7 }
+#define ENCODER_RESOLUTION 2
+
+#define OLED_DISPLAY_128X64
+#define OLED_IC OLED_IC_SH1106
+#define OLED_COLUMN_OFFSET 2
