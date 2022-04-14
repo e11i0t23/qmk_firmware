@@ -1,4 +1,4 @@
-/* Copyright 2021 Elliot Powell
+/* Copyright 2022 Elliot Powell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  */
 #include <stdio.h>
 #include "print.h"
-#include "mc_enc.h"
+#include "rgbknob.h"
 #include "raw_hid.h"
 #include "eeprom.h"
 

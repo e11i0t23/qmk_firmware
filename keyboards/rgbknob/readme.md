@@ -1,19 +1,19 @@
-# mc_enc
+# RGBKnob
 
 ![mc_enc](imgur.com image replace me!)
 
 *A short description of the keyboard/project*
 
-* Keyboard Maintainer: [Elliot Powell](https://github.com/yourusername)
-* Hardware Supported: *The PCBs, controllers supported*
-* Hardware Availability: *Links to where you can find this hardware*
+* Keyboard Maintainer: [Elliot Powell](https://github.com/e11i0t23)
+* Hardware Supported: RGBKnob
+* Hardware Availability: https://kbdfans.com/products/rgb-knob
 
 Make example for this keyboard (after setting up your build environment):
 
-    make mc_enc:default
+    make rgbknob:default
 
 Flashing example for this keyboard:
 
-    make mc_enc:default:flash
+    make rgbknob:default:flash
 
 See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_tools) and the [make instructions](https://docs.qmk.fm/#/getting_started_make_guide) for more information. Brand new to QMK? Start with our [Complete Newbs Guide](https://docs.qmk.fm/#/newbs).
