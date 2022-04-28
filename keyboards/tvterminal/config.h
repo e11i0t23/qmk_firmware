@@ -18,3 +18,7 @@
 //#define NO_ACTION_LAYER
 //#define NO_ACTION_TAPPING
 //#define NO_ACTION_ONESHOT
+
+#define ENCODERS_PAD_A { C13 }
+#define ENCODERS_PAD_B { C14 }
+#define ENCODER_RESOLUTION 2
