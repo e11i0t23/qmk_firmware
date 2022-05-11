@@ -22,3 +22,12 @@
 #define ENCODERS_PAD_A { C13 }
 #define ENCODERS_PAD_B { C14 }
 #define ENCODER_RESOLUTION 2
+
+#define PMW3389_CS_PIN A8
+#define SPI_DRIVER SPID2
+#define SPI_SCK_PIN	    B13
+#define SPI_MOSI_PIN	B14
+#define SPI_MISO_PIN	B15
+#define SPI_SCK_PAL_MODE	5
+#define SPI_MOSI_PAL_MODE	5
+#define SPI_MISO_PAL_MODE	5
