@@ -1,5 +1,5 @@
 #include QMK_KEYBOARD_H
-
+bool macos = false;
 enum custom_keycodes {
     oneMin = SAFE_RANGE,
     threeMin,
@@ -33,27 +33,28 @@ enum custom_keycodes {
     macro4
 };
 
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /*
-     * ┌───┬───┬───┬───┐
-     * │ 7 │ 8 │ 9 │ / │
-     * ├───┼───┼───┼───┤
-     * │ 4 │ 5 │ 6 │ * │
-     * ├───┼───┼───┼───┤
-     * │ 1 │ 2 │ 3 │ - │
-     * ├───┼───┼───┼───┤
-     * │ 0 │ . │Ent│ + │
-     * └───┴───┴───┴───┘
-     */
-    [0] = LAYOUT(
-        KC_ESC,   oneMin,    threeMin,   fifteenMin,    oneHour,      indicator,    invert,   alert,   hide,        save,
-        KC_ESC,   fourHour,  day,        week,          month,        fib,          tLine,    hLine,   hRay,         reset,
 
-        KC_NUM,                          search,        KC_DEL,                     undo,     redo,                    buy,
-        KC_P7,    KC_P8,     KC_P9,      KC_PMNS,       macro1,                     copy,     paste,                   sell,
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+
+    [0] = LAYOUT(
+    LT(1, KC_ESC), oneMin, threeMin,   fifteenMin,    oneHour,      indicator,    invert,   alert,   hide,        save,
+        KC_ESC,   fourHour,  day,        week,          month,        fib,          tLine,    hLine,   hRay,        reset,
+
+        KC_NUM,                          search,        KC_DEL,                     undo,     redo,                 buy,
+        KC_P7,    KC_P8,     KC_P9,      KC_PMNS,       macro1,                     copy,     paste,                sell,
         KC_4,     KC_P5,     KC_P6,      KC_PPLS,       macro2,
-        KC_P1,    KC_P2,     KC_P3,      KC_PENT,       macro3,                                                      confirm,
-        KC_P0,             KC_PDOT,                     macro4,                     KC_BTN1,  KC_BTN2
+        KC_P1,    KC_P2,     KC_P3,      KC_PENT,       macro3,                                                    confirm,
+        KC_P0,             KC_PDOT,                     macro4,                    KC_BTN1,  KC_BTN2
+    ),
+    [1] = LAYOUT(
+        KC_TRNS,  KC_TRNS, KC_TRNS,      KC_TRNS,       KC_TRNS,      KC_TRNS,      KC_TRNS, KC_TRNS, KC_TRNS,  CG_TOGG,
+        KC_TRNS,  KC_TRNS, KC_TRNS,      KC_TRNS,       KC_TRNS,      KC_TRNS,      KC_TRNS, KC_TRNS, KC_TRNS,
+
+        KC_TRNS,                         KC_TRNS,       KC_TRNS,                    KC_TRNS, KC_TRNS,           KC_TRNS,
+        KC_TRNS,  KC_TRNS, KC_TRNS,      KC_TRNS,       KC_TRNS,                    KC_TRNS, KC_TRNS,           KC_TRNS,
+        KC_TRNS,  KC_TRNS, KC_TRNS,      KC_TRNS,       KC_TRNS,
+        KC_TRNS,  KC_TRNS, KC_TRNS,      KC_TRNS,       KC_TRNS,                                                KC_TRNS,
+        KC_TRNS,           KC_TRNS,                     KC_TRNS,                    KC_TRNS, KC_TRNS, KC_TRNS
     )
 };
 
@@ -144,7 +145,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case save:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("s"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_S);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_S);
         }
         break;
     case reset:
@@ -154,22 +159,38 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case undo:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("z"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_Z);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_Z);
         }
         break;
     case redo:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("y"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_Y);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_Y);
         }
         break;
     case copy:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("c"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_C);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_C);
         }
         break;
     case paste:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("v"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_V);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_V);
         }
         break;
     case buy:
@@ -189,7 +210,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     case search:
         if (record->event.pressed) {
-            SEND_STRING(SS_LCTRL("k"));
+            register_mods(mod_config(MOD_LCTL));
+            register_code(KC_K);
+        } else {
+            unregister_mods(mod_config(MOD_LCTL));
+            unregister_code(KC_K);
         }
         break;
     case macro1:

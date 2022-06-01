@@ -19,10 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool encoder_update_kb(uint8_t index, bool clockwise) {
     if (!encoder_update_user(index, clockwise)) { return false; }
     if (index == 0) {
-        if (clockwise) {
-            tap_code(KC_VOLU);
-        } else {
-            tap_code(KC_VOLD);
+        switch (biton32(layer_state)){
+        case 1:
+            if (clockwise) {
+                tap_code(KC_MS_WH_UP);
+            } else {
+                tap_code(KC_MS_WH_DOWN);
+            }
+            break;
+        default:
+            if (clockwise) {
+                tap_code(KC_MS_WH_RIGHT);
+            } else {
+                tap_code(KC_MS_WH_LEFT);
+            }
+            break;
         }
     }
     return true;
