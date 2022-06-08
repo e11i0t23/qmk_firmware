@@ -1,1 +1,1 @@
-# The default keymap for kennyhs60
+# The default keymap for dooboo65
