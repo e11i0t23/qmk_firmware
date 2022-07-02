@@ -1,1 +1,2 @@
 VIA_ENABLE = yes
+LDO_ENABLE = yes
