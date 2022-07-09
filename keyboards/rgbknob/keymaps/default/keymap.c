@@ -309,10 +309,13 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             raw_hid_send(data, length);
 
             // update rgb to show enabled mode
-            if (rgblight_is_enabled()){
-                rgblight_set_effect_range(0, 0);
-                set_lighting();
-            }
+            // if (rgblight_is_enabled()){
+            //     rgblight_set_effect_range(0, 0);
+            //     set_lighting();
+            // }
+            rgblight_enable_noeeprom();
+            rgblight_set_effect_range(0, 0);
+            set_lighting();
 
             break;
 
