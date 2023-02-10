@@ -25,9 +25,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case MISCON:
         if (record->event.pressed) {
             // when keycode QMKBEST is pressed
-            SS_DOWN(KC_LCTL);
-            SS_TAP(KC_UP);
-            SS_UP(KC_LCTL);
+            SEND_STRING(SS_DOWN(X_LCTL)SS_TAP(X_UP)SS_UP(X_LCTL));
+            // SS_DOWN(KC_LCTL);
+            // SS_TAP(KC_UP);
+            // SS_UP(KC_LCTL);
         } else {
             // when keycode QMKBEST is released
         }
@@ -35,9 +36,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case SPTLHT:
         if (record->event.pressed) {
             // when keycode QMKBEST is pressed
-            SS_DOWN(KC_LGUI);
-            SS_TAP(KC_SPACE);
-            SS_UP(KC_LGUI);
+            SEND_STRING(SS_DOWN(X_LGUI)SS_TAP(X_SPACE)SS_UP(X_LGUI));
+            // SS_DOWN(KC_LGUI);
+            // SS_TAP(KC_SPACE);
+            // SS_UP(KC_LGUI);
         } else {
             // when keycode QMKBEST is released
         }
