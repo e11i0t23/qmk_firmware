@@ -3,6 +3,8 @@
 
 #pragma once
 
+#define USB_MAX_POWER_CONSUMPTION 100
+
 /*
  * Feature disable options
  *  These options are also useful to firmware size reduction.
