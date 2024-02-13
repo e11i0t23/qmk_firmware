@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LCD_ROTATION QP_ROTATION_0
 #define LCD_OFFSET_X 1
 #define LCD_OFFSET_Y 1
-#define LCD_INVERT_COLOUR
+// #define LCD_INVERT_COLOUR
 
 // QP Configuration
 #define QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS TRUE
@@ -46,4 +46,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SERIAL_USART_FULL_DUPLEX // Enable full duplex operation mode.
 #define SERIAL_USART_TX_PIN GP0  // USART TX pin
 #define SERIAL_USART_RX_PIN GP1  // USART RX pin
-#define SERIAL_USART_PIN_SWAP
