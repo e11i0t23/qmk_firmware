@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LCD_WAIT_TIME 200
 #define LCD_WIDTH 80
 #define LCD_HEIGHT 160
-#define LCD_ROTATION QP_ROTATION_0
+#define LCD_ROTATION QP_ROTATION_180
 #define LCD_OFFSET_X 26
 #define LCD_OFFSET_Y 1
 #define LCD_INVERT_COLOUR
