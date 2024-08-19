@@ -9,3 +9,4 @@
 
 extern const uint32_t gfx_mb_length;
 extern const uint8_t  gfx_mb[2906];
+// extern const uint8_t  lv_mb_map[];

@@ -40,6 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LCD_OFFSET_Y 1
 #define LCD_INVERT_COLOUR
 
+#define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0
+
 // QP Configuration
 #define QUANTUM_PAINTER_SUPPORTS_NATIVE_COLORS TRUE
 #define ST7735_NO_AUTOMATIC_VIEWPORT_OFFSETS
@@ -50,3 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET              // Activates the double-tap behavior
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_TIMEOUT 200U // Timeout window in ms in which the double tap can occur.
+
+#define SPLIT_TRANSACTION_IDS_KB SCR_SLV_SYNC
+#define SPLIT_WPM_ENABLE

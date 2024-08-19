@@ -21,38 +21,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "qp_comms.h"
 #include "qp_st77xx_opcodes.h"
 #include "gfx/mb.qgf.h"
-
-painter_device_t lcd;
+#include "qp_lvgl.h"
+#include "printf.h"
+#include "display/display.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Init board:
 // - Draw logo
 
 void keyboard_post_init_kb(void) {
-    wait_ms(LCD_WAIT_TIME);
-    // Initialise the LCD
-    lcd = qp_st7735_make_spi_device(LCD_WIDTH, LCD_HEIGHT, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, LCD_SPI_DIVISOR, LCD_SPI_MODE);
-    qp_init(lcd, LCD_ROTATION);
-
-// Invert Colour
-#ifdef LCD_INVERT_COLOUR
-    qp_comms_start(lcd);
-    qp_comms_command(lcd, ST77XX_CMD_INVERT_ON);
-    qp_comms_stop(lcd);
-#endif
-
-    // Apply Offset
-    qp_set_viewport_offsets(lcd, LCD_OFFSET_X, LCD_OFFSET_Y);
-
-    // Turn on the LCD and clear the display
-    qp_power(lcd, true);
-    qp_rect(lcd, 0, 0, LCD_WIDTH, LCD_HEIGHT, HSV_BLACK, true);
-
-    // Show logo
-    painter_image_handle_t logo_image = qp_load_image_mem(gfx_mb);
-    uprintf("%u", );
-    uprintf("%u", logo_image->height);
-    qp_drawimage(lcd, (LCD_WIDTH - logo_image->width) / 2, 5, logo_image);
-
+    display_init();
     keyboard_post_init_user();
+}
+
+void housekeeping_task_kb(void) {
+    display_housekeeping_task();
 }

@@ -1,6 +1,12 @@
 QUANTUM_PAINTER_ENABLE = yes
 QUANTUM_PAINTER_DRIVERS += st7735_spi
+QUANTUM_PAINTER_LVGL_INTEGRATION = yes
+CONSOLE_ENABLE = yes
+WPM_ENABLE = yes
+
 
 SRC += gfx/mb.qgf.c
+# SRC += gfx/mb.c
+SRC += display/display.c
 
 SERIAL_DRIVER = vendor
