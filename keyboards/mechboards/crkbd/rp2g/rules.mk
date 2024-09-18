@@ -8,5 +8,7 @@ WPM_ENABLE = yes
 SRC += gfx/mb.qgf.c
 # SRC += gfx/mb.c
 SRC += display/display.c
+SRC += display/pixellari_18.c
+SRC += display/pixellari_14.c
 
 SERIAL_DRIVER = vendor

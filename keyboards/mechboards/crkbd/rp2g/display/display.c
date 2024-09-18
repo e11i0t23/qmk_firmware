@@ -10,18 +10,21 @@
 
 painter_device_t lcd;
 
-lv_obj_t *label;
+lv_obj_t *label_wpm;
 lv_obj_t *label_time;
-lv_obj_t *label_mem;
-lv_obj_t *label_cpu_freq;
-lv_obj_t *label_cpu_temp;
-lv_obj_t *label_gpu_temp;
-lv_obj_t *label_gpu_mem;
+lv_obj_t *label_cpu;
+lv_obj_t *bar_cpu;
+lv_obj_t *label_gpu;
+lv_obj_t *bar_gpu;
+lv_obj_t *label_ram;
+lv_obj_t *bar_ram;
+
 lv_obj_t *label_layer;
 lv_obj_t *label_layer_now;
 lv_obj_t *label_track;
 lv_obj_t *chart;
 lv_obj_t *album_art;
+lv_obj_t *progress;
 lv_obj_t *img_scr;
 lv_obj_t *layer_btn_matrix;
 
@@ -52,6 +55,9 @@ static lv_style_t style_btn_checked;
 #ifndef LV_ATTRIBUTE_IMG_MB
 #    define LV_ATTRIBUTE_IMG_MB
 #endif
+
+// LV_FONT_DECLARE(pixellari_18);
+// LV_FONT_DECLARE(pixellari_14);
 
 LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_IMG_MB uint8_t lv_mb_map[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -128,24 +134,16 @@ lv_img_dsc_t scr = {
     .data_size          = 25604,
     .data               = lv_scr,
 };
-// lv_img_dsc_t mb = {
-//     .header.cf          = LV_IMG_CF_TRUE_COLOR,
-//     .header.always_zero = 0,
-//     .header.reserved    = 0,
-//     .header.w           = 48,
-//     .header.h           = 48,
-//     // .data_size          = 2304 * LV_COLOR_SIZE / 8,
-//     .data_size = sizeof(lv_mb_map),
-//     .data      = lv_mb_map,
-// };
 
 void display_housekeeping_task(void) {
+    // Update WPM every 5 seconds
     if (timer_elapsed(timer) > 5000 && !updating_wpm && master) {
         updating_wpm = true;
         timer        = timer_read();
         lastwpm      = currwpm;
         currwpm      = get_current_wpm();
-        // uprintf("WPM: %d\n", currwpm);
+        // If current WPM is the same as the last WPM, we will update the chart with the same value.
+        // Once we have the chart filled completly with the same one we stop updating it.
         if (currwpm == lastwpm) {
             count++;
             if (count < vals) {
@@ -153,78 +151,64 @@ void display_housekeeping_task(void) {
             }
         } else {
             count = 0;
-            lv_label_set_text_fmt(label, "WPM:%d", currwpm);
-            uprint("settext\n");
+            lv_label_set_text_fmt(label_wpm, "WPM:%d", currwpm);
             lv_chart_set_next_value(chart, ser, currwpm);
-            uprint("setvalue\n");
         }
         updating_wpm = false;
     }
 
+    // Update the layer button matrix to show selected layer
+    // As we have lv_btnmatrix_set_one_checked true, it will uncheck the last one and check the new one
     if (master) {
         currlay = get_highest_layer(layer_state);
         if (currlay != lastlay) {
-            // uprintf("%d\n", get_highest_layer(layer_state));
+            lastlay = currlay;
             switch (currlay) {
                 case 0:
                 case 1:
                 case 2:
                 case 3:
-                    // lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, lastlay, 0);
                     lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, currlay, LV_BTNMATRIX_CTRL_CHECKED);
                     break;
             }
-            lastlay = currlay;
         }
     }
 }
 
+// Read string from data to string_data to print on the display
 void read_string(uint8_t *data, char *string_data, uint8_t length) {
     // uint8_t data_length = data[2];
-    memcpy(string_data, data + 2, length);
+    memcpy(string_data, data + 4, length);
     string_data[length] = '\0';
 }
 
 void processes_command(uint8_t *data, uint8_t length) {
     uint8_t command = data[2];
     char    string[length - 2];
+    uprintf("Command: %d\n", command);
+    // uprintf("data[4] %u", data[4]);
     switch (command) {
-        // case _TIME:
-        //     read_string(data, string, length - 2);
-        //     uprintf("Time: %s\n", string);
-        //     lv_label_set_text(label_time, string);
-        //     break;
-
-        // case _MEM:
-        //     read_string(data, string, length - 2);
-        //     uprintf("Mem: %s\n", string);
-        //     lv_label_set_text_fmt(label_mem, "MEM: %s", string);
-        //     break;
-        // case _CPU_FREQ:
-        //     read_string(data, string, length - 2);
-        //     uprintf("CPU: %s\n", string);
-        //     lv_label_set_text_fmt(label_cpu_freq, "CPU: %s", string);
-        //     break;
-        // case _CPU_TEMP:
-        //     read_string(data, string, length - 2);
-        //     uprintf("CPU: %s\n", string);
-        //     lv_label_set_text_fmt(label_cpu_temp, "CPU: %sC", string);
-        //     break;
-        // case _GPU_TEMP:
-        //     read_string(data, string, length - 2);
-        //     uprintf("GPU: %s\n", string);
-        //     lv_label_set_text_fmt(label_gpu_temp, "GPU: %sC", string);
-        //     break;
-        // case _GPU_MEM:
-        //     read_string(data, string, length - 2);
-        //     uprintf("GPU: %s\n", string);
-        //     lv_label_set_text_fmt(label_gpu_mem, "GPU: %s", string);
-        //     break;
-        case _NOWPLAYING:
+        case _TIME:
             read_string(data, string, length - 2);
+            uprintf("Time: %s\n", string);
+            lv_label_set_text(label_time, string);
+            break;
+        case _RAM:
+            lv_bar_set_value(bar_ram, data[4], LV_ANIM_OFF);
+            break;
+        case _CPU:
+            lv_bar_set_value(bar_cpu, data[4], LV_ANIM_OFF);
+            break;
+        case _GPU:
+            lv_bar_set_value(bar_gpu, data[4], LV_ANIM_OFF);
+            break;
+        case _PROGRESS:
+            lv_slider_set_value(progress, data[4], LV_ANIM_ON);
+            break;
+        case _NOWPLAYING:
+            read_string(data, string, length - 4);
             uprintf("Now Playing: %s\n", string);
             lv_label_set_text_fmt(label_track, "%s", string);
-
             break;
         case _IMAGE:
             uint16_t x = ((uint16_t)data[4] << 8) | data[5];
@@ -242,10 +226,14 @@ void processes_command(uint8_t *data, uint8_t length) {
     }
 }
 
+// Takes the data from the host and processes it
+// This works whether VIA is enabled or just RawHID
+// Data is in the format:
 // data[0] VIA COMMAND_ID (0x07 - custom set)
 // data[1] VIA Channel_ID (0x00)
 // data[2] display_data_type
 // data[3] master = 0x00, slave = 0x01
+// data[4:31] data
 #ifdef RAW_ENABLE
 #    ifdef VIA_ENABLE
 void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
@@ -261,6 +249,7 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 }
 #endif
 
+// This function is called when the master sends data to the slave, which is then processed with processes_command
 void screen_sync_slave_handler(uint8_t length, const void *in_data, uint8_t out_buflen, void *out_data) {
     uint8_t *data = (uint8_t *)in_data;
     processes_command(data, length);
@@ -286,133 +275,178 @@ void display_init(void) {
     qp_comms_stop(lcd);
 #endif
 
-    if (qp_lvgl_attach(lcd) && master) { // Attach LVGL to the display
-        /*Change the active screen's background color*/
-        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+    if (!qp_lvgl_attach(lcd)) return;
 
-        /*Create a white label, set its text and align it to the center*/
-        label = lv_label_create(lv_scr_act());
-        lv_label_set_text(label, "WPM:0");
-        lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-        lv_obj_align(label, LV_ALIGN_CENTER, 0, 20);
-        // lv_obj_set_width(label, 80);
-        // lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR); /*Circular scroll*/
+    if (master)
+        draw_master();
+    else
+        draw_slave();
+}
 
-        // label_time = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_time, "18:32");
-        // lv_obj_align(label_time, LV_ALIGN_CENTER, 0, -75);
-        // lv_obj_set_width(label_time, 80);
+void draw_master(void) {
+    /*Change the active screen's background color*/
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-        // label_mem = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_mem, "MEM: 17%");
-        // lv_obj_align(label_mem, LV_ALIGN_CENTER, 0, -60);
-        // lv_obj_set_width(label_mem, 80);
+    static lv_style_t bar_style_bg;
+    lv_style_init(&bar_style_bg);
+    lv_style_set_bg_color(&bar_style_bg, lv_color_hex(0x111111));
+    lv_style_set_radius(&bar_style_bg, 0);
+    static lv_style_t bar_style_indic;
+    lv_style_init(&bar_style_indic);
+    lv_style_set_bg_color(&bar_style_indic, lv_color_hex(mb_col));
+    lv_style_set_radius(&bar_style_indic, 0);
 
-        // label_cpu_freq = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_cpu_freq, "CPU: 2.4");
-        // lv_obj_align(label_cpu_freq, LV_ALIGN_CENTER, 0, -45);
-        // lv_obj_set_width(label_cpu_freq, 80);
+    label_cpu = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_cpu, "CPU");
+    lv_obj_align(label_cpu, LV_ALIGN_TOP_LEFT, 1, 1);
+    lv_obj_set_style_text_font(label_cpu, &pixellari_14, LV_PART_MAIN);
 
-        // label_cpu_temp = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_cpu_temp, "CPU: 75C");
-        // lv_obj_align(label_cpu_temp, LV_ALIGN_CENTER, 0, -30);
-        // lv_obj_set_width(label_cpu_temp, 80);
+    bar_cpu = lv_bar_create(lv_scr_act());
+    lv_obj_set_size(bar_cpu, 48, 13);
+    lv_obj_align(bar_cpu, LV_ALIGN_TOP_LEFT, 30, 1);
+    lv_obj_add_style(bar_cpu, &bar_style_bg, 0);
+    lv_obj_add_style(bar_cpu, &bar_style_indic, LV_PART_INDICATOR);
+    lv_bar_set_range(bar_cpu, 0, 100);
+    lv_bar_set_value(bar_cpu, 75, LV_ANIM_OFF);
 
-        label_layer = lv_label_create(lv_scr_act());
-        lv_label_set_text(label_layer, "LAYER");
-        lv_obj_align(label_layer, LV_ALIGN_CENTER, 0, -24);
-        // lv_obj_set_width(label_layer);
+    label_gpu = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_gpu, "GPU");
+    lv_obj_align(label_gpu, LV_ALIGN_TOP_LEFT, 1, 16);
+    lv_obj_set_style_text_font(label_gpu, &pixellari_14, LV_PART_MAIN);
 
-        lv_style_init(&style_btn_matrix);
-        lv_style_init(&style_btn);
-        lv_style_init(&style_btn_checked);
-        lv_style_set_bg_opa(&style_btn_matrix, LV_OPA_TRANSP); // Set transparent background
-        lv_style_set_pad_all(&style_btn_matrix, 4);
-        lv_style_set_pad_column(&style_btn_matrix, 1);
-        lv_style_set_border_width(&style_btn_matrix, 0);
-        // lv_style_set_bg_opa(&style_btn_matrix, LV_OPA_TRANSP); // Set transparent background
-        // no border
-        lv_style_set_border_width(&style_btn_matrix, 0);
+    bar_gpu = lv_bar_create(lv_scr_act());
+    lv_obj_set_size(bar_gpu, 48, 13);
+    lv_obj_align(bar_gpu, LV_ALIGN_TOP_LEFT, 30, 16);
+    lv_obj_add_style(bar_gpu, &bar_style_bg, 0);
+    lv_obj_add_style(bar_gpu, &bar_style_indic, LV_PART_INDICATOR);
+    lv_bar_set_range(bar_gpu, 0, 100);
+    lv_bar_set_value(bar_gpu, 50, LV_ANIM_OFF);
 
-        lv_style_set_radius(&style_btn, 5);                              // Set rounded edges
-        lv_style_set_text_color(&style_btn, lv_color_hex(0xffffff));     // Set white text color
-        lv_style_set_bg_color(&style_btn, lv_color_hex(0x444444));       // Set background color
-        lv_style_set_bg_color(&style_btn_checked, lv_color_hex(mb_col)); // Set background color if checked
+    label_ram = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_ram, "RAM");
+    lv_obj_align(label_ram, LV_ALIGN_TOP_LEFT, 1, 31);
+    lv_obj_set_style_text_font(label_ram, &pixellari_14, LV_PART_MAIN);
 
-        // label_layer_now = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_layer_now, "Default");
-        // lv_obj_align(label_layer_now, LV_ALIGN_CENTER, 0, -2);
-        // lv_obj_set_width(label_layer_now, 80);
-        layer_btn_matrix = lv_btnmatrix_create(lv_scr_act());
-        lv_obj_set_size(layer_btn_matrix, 80, 24);
-        lv_obj_align(layer_btn_matrix, LV_ALIGN_CENTER, 0, -2);
-        lv_btnmatrix_set_map(layer_btn_matrix, btnm_map);
-        lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 0, LV_BTNMATRIX_CTRL_CHECKABLE);
-        lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 1, LV_BTNMATRIX_CTRL_CHECKABLE);
-        lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 2, LV_BTNMATRIX_CTRL_CHECKABLE);
-        lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 3, LV_BTNMATRIX_CTRL_CHECKABLE);
-        lv_obj_add_style(layer_btn_matrix, &style_btn_matrix, LV_PART_MAIN);
-        lv_obj_add_style(layer_btn_matrix, &style_btn, LV_PART_ITEMS);
-        lv_obj_add_style(layer_btn_matrix, &style_btn_checked, LV_PART_ITEMS | LV_STATE_CHECKED);
-        lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 0, LV_BTNMATRIX_CTRL_CHECKED);
-        lv_btnmatrix_set_one_checked(layer_btn_matrix, true);
+    bar_ram = lv_bar_create(lv_scr_act());
+    lv_obj_set_size(bar_ram, 48, 13);
+    lv_obj_align(bar_ram, LV_ALIGN_TOP_LEFT, 30, 31);
+    lv_obj_add_style(bar_ram, &bar_style_bg, 0);
+    lv_obj_add_style(bar_ram, &bar_style_indic, LV_PART_INDICATOR);
+    lv_bar_set_range(bar_ram, 0, 100);
+    lv_bar_set_value(bar_ram, 95, LV_ANIM_OFF);
 
-        // label_gpu_temp = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_gpu_temp, "Layer");
-        // lv_obj_align(label_gpu_temp, LV_ALIGN_CENTER, 0, -17);
-        // lv_obj_set_width(label_gpu_temp, 80);
+    // Layer Indication
+    label_layer = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_layer, "LAYER");
+    lv_obj_align(label_layer, LV_ALIGN_CENTER, 0, -24);
 
-        // label_gpu_mem = lv_label_create(lv_scr_act());
-        // lv_label_set_text(label_gpu_mem, "Default");
-        // lv_obj_align(label_gpu_mem, LV_ALIGN_CENTER, 0, -2);
-        // lv_obj_set_width(label_gpu_mem, 80);
+    lv_style_init(&style_btn_matrix);
+    lv_style_init(&style_btn);
+    lv_style_init(&style_btn_checked);
+    lv_style_set_bg_opa(&style_btn_matrix, LV_OPA_TRANSP); // Set transparent background
+    lv_style_set_pad_all(&style_btn_matrix, 4);
+    lv_style_set_pad_column(&style_btn_matrix, 1);
+    lv_style_set_border_width(&style_btn_matrix, 0);
+    lv_style_set_border_width(&style_btn_matrix, 0);
 
-        /*Create a chart1*/
-        chart = lv_chart_create(lv_scr_act());
-        lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-        // lv_chart_set_type(chart, LV_CHART_TYPE_BAR);
-        lv_chart_set_point_count(chart, vals);
-        lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 150);
-        lv_obj_set_style_pad_column(chart, 0.1, 0);
-        lv_obj_set_size(chart, 80, 40);
-        lv_obj_align(chart, LV_ALIGN_CENTER, 0, 50);
-        lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 0, 0, 0, 0, 0, 0);
-        lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 0, 0, 0, 0);
+    lv_style_set_radius(&style_btn, 5);                              // Set rounded edges
+    lv_style_set_text_color(&style_btn, lv_color_hex(0xffffff));     // Set white text color
+    lv_style_set_bg_color(&style_btn, lv_color_hex(0x444444));       // Set background color
+    lv_style_set_bg_color(&style_btn_checked, lv_color_hex(mb_col)); // Set background color if checked
 
-        ser = lv_chart_add_series(chart, lv_color_hex(0x30b1b6), LV_CHART_AXIS_PRIMARY_Y);
-        // lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_CIRCULAR);
-        lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
-        lv_obj_set_style_size(chart, 3, LV_PART_ITEMS);
+    layer_btn_matrix = lv_btnmatrix_create(lv_scr_act());
+    lv_obj_set_size(layer_btn_matrix, 80, 24);
+    lv_obj_align(layer_btn_matrix, LV_ALIGN_CENTER, 0, -2);
+    lv_btnmatrix_set_map(layer_btn_matrix, btnm_map);
+    lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 0, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 1, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 2, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 3, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_style(layer_btn_matrix, &style_btn_matrix, LV_PART_MAIN);
+    lv_obj_add_style(layer_btn_matrix, &style_btn, LV_PART_ITEMS);
+    lv_obj_add_style(layer_btn_matrix, &style_btn_checked, LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(layer_btn_matrix, 0, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_one_checked(layer_btn_matrix, true);
 
-        static lv_style_t style_chart;
-        lv_style_init(&style_chart);
-        lv_style_set_bg_color(&style_chart, lv_color_hex(0x000000));
-        lv_style_set_line_width(&style_chart, 0);
-        lv_style_set_border_width(&style_chart, 0);
-        lv_obj_add_style(chart, &style_chart, LV_PART_MAIN);
-        // lv_obj_set_style_size(chart, 0, LV_PART_MAIN);
-        // lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
-        // lv_obj_add_flag(chart, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    /*WPM chart and Label*/
+    label_wpm = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_wpm, "WPM:0");
+    lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(label_wpm, LV_ALIGN_CENTER, 0, 20);
 
-        img_scr = lv_img_create(lv_scr_act());
+    chart = lv_chart_create(lv_scr_act());
+    lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
+    lv_chart_set_point_count(chart, vals);
+    lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 150);
+    lv_obj_set_style_pad_column(chart, 0.1, 0);
+    lv_obj_set_size(chart, 80, 40);
+    lv_obj_align(chart, LV_ALIGN_CENTER, 0, 50);
+    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 0, 0, 0, 0, 0, 0);
+    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 0, 0, 0, 0);
 
-    } else if (qp_lvgl_attach(lcd)) {
-        lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+    ser = lv_chart_add_series(chart, lv_color_hex(0x30b1b6), LV_CHART_AXIS_PRIMARY_Y);
+    lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_size(chart, 3, LV_PART_ITEMS);
 
-        album_art = lv_img_create(lv_scr_act());
+    static lv_style_t style_chart;
+    lv_style_init(&style_chart);
+    lv_style_set_bg_color(&style_chart, lv_color_hex(0x000000));
+    lv_style_set_line_width(&style_chart, 0);
+    lv_style_set_border_width(&style_chart, 0);
+    lv_obj_add_style(chart, &style_chart, LV_PART_MAIN);
 
-        lv_img_set_src(album_art, &mb);
-        lv_obj_align(album_art, LV_ALIGN_TOP_MID, 0, 8);
+    // Whole Screen Custom Image Container
+    img_scr = lv_img_create(lv_scr_act());
+}
 
-        label_track = lv_label_create(lv_scr_act());
-        lv_label_set_text(label_track, "Now Playing");
-        lv_obj_align(label_track, LV_ALIGN_CENTER, 0, 13);
-        lv_obj_set_width(label_track, 74);
-        lv_obj_set_style_text_color(label_track, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
-        // lv_obj_set_style_text_font(label_track, LV_FONT_MONTSERRAT_28, LV_PART_MAIN);
-        lv_label_set_long_mode(label_track, LV_LABEL_LONG_SCROLL_CIRCULAR);
+void draw_slave(void) {
+    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
 
-        img_scr = lv_img_create(lv_scr_act());
-        lv_obj_align(img_scr, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
-    }
+    label_time = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_time, "00:00");
+    lv_obj_align(label_time, LV_ALIGN_TOP_MID, 0, 4);
+
+    album_art = lv_img_create(lv_scr_act());
+
+    lv_img_set_src(album_art, &mb);
+    lv_obj_align(album_art, LV_ALIGN_TOP_MID, 0, 30);
+
+    label_track = lv_label_create(lv_scr_act());
+    lv_label_set_text(label_track, "Now Playing");
+    lv_obj_align(label_track, LV_ALIGN_CENTER, 0, 35);
+    lv_obj_set_width(label_track, 74);
+    lv_obj_set_style_text_color(label_track, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    // lv_obj_set_style_text_font(label_track, LV_FONT_MONTSERRAT_28, LV_PART_MAIN);
+    lv_label_set_long_mode(label_track, LV_LABEL_LONG_SCROLL_CIRCULAR);
+
+    static lv_style_t style_main;
+    static lv_style_t style_indicator;
+    static lv_style_t style_knob;
+    lv_style_init(&style_main);
+    lv_style_set_bg_color(&style_main, lv_color_hex3(0xbbb));
+    lv_style_set_radius(&style_main, LV_RADIUS_CIRCLE);
+    lv_style_set_width(&style_main, 1);
+    // lv_style_set_pad_ver(&style_main, 2); /*Makes the indicator smaller*/
+
+    lv_style_init(&style_indicator);
+    lv_style_set_bg_opa(&style_indicator, LV_OPA_COVER);
+    lv_style_set_bg_color(&style_indicator, lv_color_hex3(0xbbb));
+    lv_style_set_radius(&style_indicator, LV_RADIUS_CIRCLE);
+
+    lv_style_init(&style_knob);
+    lv_style_set_bg_opa(&style_knob, LV_OPA_COVER);
+    lv_style_set_bg_color(&style_knob, lv_color_hex(mb_col));
+    lv_style_set_radius(&style_knob, LV_RADIUS_CIRCLE);
+    lv_style_set_pad_all(&style_knob, 1); /*Makes the knob larger*/
+
+    progress = lv_slider_create(lv_scr_act());
+    lv_obj_set_size(progress, 70, 4);
+    lv_obj_align(progress, LV_ALIGN_CENTER, 0, 60);
+    lv_slider_set_range(progress, 0, 100);
+    lv_obj_add_style(progress, &style_main, LV_PART_MAIN);
+    lv_obj_add_style(progress, &style_indicator, LV_PART_INDICATOR);
+    lv_obj_add_style(progress, &style_knob, LV_PART_KNOB);
+
+    img_scr = lv_img_create(lv_scr_act());
+    lv_obj_align(img_scr, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
 }
