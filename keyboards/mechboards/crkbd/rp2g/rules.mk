@@ -5,9 +5,12 @@ CONSOLE_ENABLE = yes
 WPM_ENABLE = yes
 
 
-SRC += gfx/mb.qgf.c
+# SRC += gfx/mb.qgf.c
 # SRC += gfx/mb.c
 SRC += display/display.c
+SRC += display/screens.c
+SRC += display/styles.c
+SRC += display/pixellari_24.c
 SRC += display/pixellari_18.c
 SRC += display/pixellari_14.c
 
